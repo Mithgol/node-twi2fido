@@ -40,7 +40,8 @@ module.exports = function(loginName, textOutput, fileLastRead){
                // source.created_at,
                // '\n',
                moment(
-                  new Date(source.created_at)
+                  source.created_at,
+                  'ddd MMM DD HH:mm:ss ZZ YYYY'
                ).utc().format('YYYY-MM-DD HH:mm:ss'),
                ' (UTC)\n\n',
                'https://twitter.com/',
