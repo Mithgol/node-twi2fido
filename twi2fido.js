@@ -13,11 +13,11 @@ if( process.argv.length < 3 ){
    clog('');
    clog('loginName    -- login name (screen name) of a microblog in Twitter');
    clog('');
-   clog('textOutput   -- (optional) name of an output text file');
+   clog('textOutput   -- (optional) path to an output text file');
    clog('                where the recent tweets should be written to.');
    clog('                (By default, loginName.tweets.txt.)');
    clog('');
-   clog('fileLastRead -- (optional) name of a file where the number');
+   clog('fileLastRead -- (optional) path to a file where the ID');
    clog('                of the last read tweet will be stored.');
    clog('                (By default, loginName.lastread.txt.)');
 } else if (process.argv.length == 3) {
