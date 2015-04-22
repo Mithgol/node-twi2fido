@@ -83,6 +83,10 @@ For example, users of [HPT](http://husky.sourceforge.net/hpt.html) might use th
 
 (However, it would be necessary to substitute `textOutput` with the real full path of the output file.)
 
+## Known problems
+
+The output text is generated in UTF-8 encoding which is not supported by [GoldED+](http://golded-plus.sourceforge.net/) and other readers popular in Fidonet.
+
 ## License
 
 MIT license (see the `LICENSE` file).
