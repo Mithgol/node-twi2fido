@@ -26,6 +26,14 @@ You may now move that directory (for example, on a flash drive) across syst
 
 Unlike the above (`npm -g`), the application does not appear in the `PATH`, and thus you'll have to run it directly from the application's directory. You'll also have to use `node twi2fido [parameters]` instead of `twi2fido [parameters]`.
 
+## Configuration steps
+
+1. Visit https://apps.twitter.com/ and register an application. (You may use “twi2fido” as the application's name and https://github.com/Mithgol/node-twi2fido/ as its site. The “read only” permissions should suffice because the application does not post anything to Twitter.)
+
+2. Create an access token.
+
+3. Copy `example.config` to `twi2fido.config`. Edit `twi2fido.config`: instead of `XXXXX...` placeholders you should paste the values of `ConsumerKey`, `ConsumerSecret`, `AccessTokenKey`, `AccessTokenSecret` that were assigned by Twitter to your application and token.
+
 ## License
 
 MIT license (see the `LICENSE` file).
