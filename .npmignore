@@ -37,3 +37,5 @@ test
 
 # Project specific
 twi2fido.config
+*.tweets.txt
+*.lastread.txt

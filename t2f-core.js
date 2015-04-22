@@ -52,7 +52,8 @@ module.exports = function(loginName, textOutput, fileLastRead){
                source.text
             ].join('');
          });
-         console.log(content);
+         // console.log(content);
+         fs.writeFileSync(textOutput, content);
       }
    );
 };
