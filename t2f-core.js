@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
+var fiunis = require('fiunis');
 var moment = require('moment');
 var simteconf = require('simteconf');
 var twitter = require('twitter');
@@ -23,9 +24,37 @@ var eraseFile = function(filename){
    } catch(e) {};
 };
 
-module.exports = function(loginName, textOutput, fileLastRead){
+module.exports = function(loginName, textOutput, fileLastRead, CHRS){
    textOutput   = path.resolve(__dirname, textOutput);
    fileLastRead = path.resolve(__dirname, fileLastRead);
+
+   var spaceIDX = CHRS.indexOf(' ');
+   if( spaceIDX < 0 ){
+      console.log([
+         'The given charset "',
+         CHRS,
+         '" does not have an <encoding><whitespace><level> form.'
+      ].join(''));
+      console.log([
+         'The standard ',
+         'http://ftsc.org/docs/fts-5003.001',
+         ' does not currently recommend it.'
+      ].join(''));
+      eraseFile(textOutput);
+      process.exit(1);
+   }
+   var encodingCHRS = CHRS.slice(0, spaceIDX);
+   if( !Buffer.isEncoding(encodingCHRS) ){
+      console.log('The given encoding "' + encodingCHRS + '" is unknown.');
+      console.log([
+         'The module ',
+         'https://github.com/ashtuchkin/iconv-lite',
+         ' does not support it.'
+      ].join(''));
+      eraseFile(textOutput);
+      process.exit(1);
+   }
+   var modeUTF8 = (encodingCHRS === 'UTF-8' || encodingCHRS === 'UTF8');
 
    var twi = new twitter({
       consumer_key:        config.last('ConsumerKey'),
@@ -48,7 +77,7 @@ module.exports = function(loginName, textOutput, fileLastRead){
    twi.get('statuses/user_timeline', tweeOptions, function(err, tweetList){
       if( err ) throw new Error( util.inspect(err, { depth: null }) );
 
-      var content = '';
+      var content = '\x01CHRS: ' + CHRS + '\n\n';
       // console.log( util.inspect(tweetList, { depth: null }) );
       if( tweetList.length < 1 ){
          eraseFile(textOutput);
@@ -80,6 +109,7 @@ module.exports = function(loginName, textOutput, fileLastRead){
          ].join('');
       });
       // console.log(content);
+      if( !modeUTF8 ) content = fiunis.encode(content, encodingCHRS);
       fs.writeFileSync(textOutput, content);
       console.log(tweetList.length + ' tweet(s) written.');
       fs.writeFileSync(fileLastRead, tweetList[0].id_str);

@@ -51,6 +51,10 @@ It uses the following parameters:
    * If the path is not absolute, it is treated as relative to the directory where `twi2fido` resides.
    * If the file (designated by `fileLastRead`) does not exist, then `twi2fido` cannot determine how many last tweets to post. The default number of 50 last tweets is used.
 
+An optional parameter `"--CHRS=CP866 2"` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` writes tweets in the given encoding instead of the default UTF-8 encoding.
+   * Instead of `CP866 2` such parameter can designate any of Level 2 (single-byte) encodings supported by the [FTS-5003.001](http://ftsc.org/docs/fts-5003.001) standard in Fidonet.
+   * That single-byte encoding must also be supported by the [`iconv-lite`](https://github.com/ashtuchkin/iconv-lite) module. (Don't worry, most of them are supported.)
+
 The application does one of the following:
 
 * If some tweets (microblog entries) appeared after the tweet that was read last time (that tweet's ID is stored in `fileLastRead`), these tweets become posted to `textOutput`.
@@ -81,11 +85,7 @@ For example, users of [HPT](http://husky.sourceforge.net/hpt.html) might use th
 
 `if exist textOutput hpt post -nf "twi2fido" -s "Tweets" -e "Example.Echotag" -z "twi2fido" -f loc textOutput`
 
-(However, it would be necessary to substitute `textOutput` with the real full path of the output file.)
-
-## Known problems
-
-The output text is generated in UTF-8 encoding which is not supported by [GoldED+](http://golded-plus.sourceforge.net/) and other readers popular in Fidonet.
+(However, it would be necessary to substitute every `textOutput` with the real full path of the output file.)
 
 ## License
 
