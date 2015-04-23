@@ -77,7 +77,7 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
    twi.get('statuses/user_timeline', tweeOptions, function(err, tweetList){
       if( err ) throw new Error( util.inspect(err, { depth: null }) );
 
-      var content = '\x01CHRS: ' + CHRS + '\n\n';
+      var content = '\x01CHRS: ' + CHRS + '\n\u00A0\n';
       // console.log( util.inspect(tweetList, { depth: null }) );
       if( tweetList.length < 1 ){
          eraseFile(textOutput);
@@ -85,7 +85,6 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
          return;
       }
       tweetList.forEach(function(tweet, idx){
-         if( idx > 0 ) content += '\n\n\n\n';
          var source = tweet.retweeted_status || tweet;
 
          content += [
@@ -105,7 +104,8 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
             '/status/',
             source.id,
             '\n\n',
-            source.text
+            source.text,
+            '\n\n\n\n'
          ].join('');
       });
       // console.log(content);
