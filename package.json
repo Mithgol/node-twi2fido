@@ -4,7 +4,7 @@
 "preferGlobal": true,
 "main": "t2f-core.js",
 "version": "1.0.0",
-"description": "Aggregates microblog entries from Twitter and posts them to Fidonet.",
+"description": "Aggregates microblog entries from Twitter and prepares them for being posted to Fidonet.",
 "keywords": ["Fidonet", "Fido", "Twitter"],
 "author": { "name": "Mithgol the Webmaster" },
 "license": "MIT",
@@ -17,5 +17,8 @@
    "moment": "~2.10.2",
    "simteconf": "~0.6.9",
    "twitter": "~1.2.5"
+},
+"scripts": {
+   "test": "jshint --verbose twi2fido.js t2f-core.js"
 }
 }

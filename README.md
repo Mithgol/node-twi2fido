@@ -1,10 +1,10 @@
 [![(a histogram of downloads)](https://nodei.co/npm-dl/twi2fido.png?height=3)](https://npmjs.org/package/twi2fido)
 
-This application (`twi2fido`) aggregates microblog entries from Twitter and then posts them to Fidonet. (Its name is derived from loosely abbreviated words “tweet to Fido”.)
+This application (`twi2fido`) aggregates microblog entries from Twitter and then prepares them for being posted to Fidonet. (Its name is derived from loosely abbreviated words “tweet to Fido”.)
 
 This application is written in JavaScript and requires [Node.js](http://nodejs.org/) to run. (Node.js version 0.10.x or 0.12.x is recommended. The latest stable [io.js](https://iojs.org/) is fine too.)
 
-## Installing the application
+## Installing twi2fido
 
 [![(npm package version)](https://nodei.co/npm/twi2fido.png?downloads=true&downloadRank=true)](https://npmjs.org/package/twi2fido)
 
@@ -32,7 +32,7 @@ Unlike the above (`npm -g`), the application does not appear in the `PATH`, a
 
 3. Copy `example.config` to `twi2fido.config`. Edit `twi2fido.config`: instead of `XXXXX...` placeholders you should paste the values of `ConsumerKey`, `ConsumerSecret`, `AccessTokenKey`, `AccessTokenSecret` that were assigned by Twitter to your application and token.
 
-## Using the application
+## Using twi2fido
 
 You may run the installed application by typing in the command line:
 
@@ -86,6 +86,14 @@ For example, users of [HPT](http://husky.sourceforge.net/hpt.html) might use th
 `if exist textOutput hpt post -nf "twi2fido" -s "Tweets" -e "Example.Echotag" -z "twi2fido" -f loc textOutput`
 
 (However, it would be necessary to substitute every `textOutput` with the real full path of the output file.)
+
+## Testing twi2fido
+
+It is necessary to install [JSHint](http://jshint.com/) for testing.
+
+* You may install JSHint globally (`npm install jshint -g`) or locally (`npm install jshint` in the directory of twi2fido).
+
+After that you may run `npm test` (in the directory of twi2fido). Only the JS code errors are caught.
 
 ## License
 

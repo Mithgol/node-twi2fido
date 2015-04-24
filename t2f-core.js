@@ -11,17 +11,17 @@ var config = simteconf( path.join(__dirname, 'twi2fido.config') );
 var getLastReadFromFile = function(filename){
    try {
       var readData = fs.readFileSync(filename, {encoding: 'utf8'});
+      if( /^\s*$/.test(readData) ) return null;
+      return readData;
    } catch(e) {
       return null;
    }
-   if( /^\s*$/.test(readData) ) return null;
-   return readData;
 };
 
 var eraseFile = function(filename){
    try {
       fs.unlinkSync(filename);
-   } catch(e) {};
+   } catch(e) {}
 };
 
 module.exports = function(loginName, textOutput, fileLastRead, CHRS){
@@ -84,7 +84,7 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
          console.log('Zero tweets received, output file erased.');
          return;
       }
-      tweetList.forEach(function(tweet, idx){
+      tweetList.forEach(function(tweet){
          var source = tweet.retweeted_status || tweet;
 
          content += [

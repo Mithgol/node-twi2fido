@@ -38,11 +38,11 @@ if( params.length < 1 ){
    clog('All of the FTS-5003.001 Level 2 character sets are supported');
    clog('as long as https://github.com/ashtuchkin/iconv-lite knows of them');
    clog('(usually it does).');
-} else if (params.length == 1) {
+} else if (params.length === 1) {
    loginName    = params[0];
    textOutput   = loginName + '.tweets.txt';
    fileLastRead = loginName + '.lastread.txt';
-} else if (params.length == 2) {
+} else if (params.length === 2) {
    loginName    = params[0];
    textOutput   = params[1];
    fileLastRead = loginName + '.lastread.txt';
