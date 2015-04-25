@@ -65,14 +65,11 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
 
    var tweeOptions = {
       // include_rts: false,
+      count: 50,
       screen_name: loginName
    };
    var lastRead = getLastReadFromFile(fileLastRead);
-   if( lastRead === null ){
-      tweeOptions.count = 50;
-   } else {
-      tweeOptions.since_id = lastRead;
-   }
+   if( lastRead !== null ) tweeOptions.since_id = lastRead;
 
    twi.get('statuses/user_timeline', tweeOptions, function(err, tweetList){
       if( err ) throw new Error( util.inspect(err, { depth: null }) );
