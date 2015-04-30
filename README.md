@@ -12,13 +12,13 @@ This application is written in JavaScript and requires [Node.js](http://nodejs
 
 * Latest packaged version: `npm install -g twi2fido`
 
-* Latest githubbed version: `npm install -g https://github.com/Mithgol/twi2fido/tarball/master`
+* Latest githubbed version: `npm install -g https://github.com/Mithgol/node-twi2fido/tarball/master`
 
 The application becomes installed globally and appears in the `PATH`. Then use `twi2fido` command to run the application.
 
 ### Installing as a portable application
 
-Instead of the above, download the [ZIP-packed](https://github.com/Mithgol/twi2fido/archive/master.zip) source code of the application and unpack it to some directory. Then run `npm install --production` in that directory.
+Instead of the above, download the [ZIP-packed](https://github.com/Mithgol/node-twi2fido/archive/master.zip) source code of the application and unpack it to some directory. Then run `npm install --production` in that directory.
 
 You may now move that directory (for example, on a flash drive) across systems as long as they have the required version of Node.js installed.
 
