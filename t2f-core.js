@@ -65,7 +65,7 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
 
    var tweeOptions = {
       // include_rts: false,
-      count: 50,
+      count: 60,
       screen_name: loginName
    };
    var lastRead = getLastReadFromFile(fileLastRead);
