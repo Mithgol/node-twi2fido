@@ -99,7 +99,7 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
             'https://twitter.com/',
             source.user.screen_name,
             '/status/',
-            source.id,
+            source.id_str,
             '\n\n',
             source.text,
             '\n\n\n\n'
