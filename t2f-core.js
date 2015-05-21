@@ -111,7 +111,10 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
          if( !err && typeof userdata.profile_image_url_https === 'string' ){
             content = [
                '\x01AVATAR: ',
-               userdata.profile_image_url,
+               userdata.profile_image_url.replace(
+                  /_normal\.(jpe?g|png|gif|svg|webp)$/,
+                  '.$1'
+               ),
                '\n',
                content
             ].join('');
