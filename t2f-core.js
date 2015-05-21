@@ -74,7 +74,7 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
    twi.get('statuses/user_timeline', tweeOptions, function(err, tweetList){
       if( err ) throw new Error( util.inspect(err, { depth: null }) );
 
-      var content = '\x01CHRS: ' + CHRS + '\n\u00A0\n';
+      var content = '';
       // console.log( util.inspect(tweetList, { depth: null }) );
       if( tweetList.length < 1 ){
          eraseFile(textOutput);
@@ -106,9 +106,21 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
          ].join('');
       });
       // console.log(content);
-      if( !modeUTF8 ) content = fiunis.encode(content, encodingCHRS);
-      fs.writeFileSync(textOutput, content);
-      console.log(tweetList.length + ' tweet(s) written.');
-      fs.writeFileSync(fileLastRead, tweetList[0].id_str);
+      twi.get('users/show', {screen_name: loginName}, function(err, userdata){
+         content = '\u00A0\n' + content;
+         if( !err && typeof userdata.profile_image_url_https === 'string' ){
+            content = [
+               '\x01AVATAR: ',
+               userdata.profile_image_url,
+               '\n',
+               content
+            ].join('');
+         }
+         content = '\x01CHRS: ' + CHRS + '\n' + content;
+         if( !modeUTF8 ) content = fiunis.encode(content, encodingCHRS);
+         fs.writeFileSync(textOutput, content);
+         console.log(tweetList.length + ' tweet(s) written.');
+         fs.writeFileSync(fileLastRead, tweetList[0].id_str);
+      });
    });
 };
