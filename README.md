@@ -49,7 +49,7 @@ It uses the following parameters:
 * `fileLastRead` — *(optional)* path to a file where the ID of the last read tweet is stored.
    * If `fileLastRead` is not given, then the path `loginName.lastread.txt` is used (for the given value of `loginName`).
    * If the path is not absolute, it is treated as relative to the directory where `twi2fido` resides.
-   * If the file (designated by `fileLastRead`) does not exist, then `twi2fido` cannot determine how many last tweets to post. The default maximum of 64 last tweets is used.
+   * If the file (designated by `fileLastRead`) does not exist, then `twi2fido` cannot determine how many last tweets to post. The default maximum of 60 last tweets is used.
 
 An optional parameter `"--CHRS=CP866 2"` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` writes tweets in the given encoding instead of the default UTF-8 encoding.
    * Instead of `CP866 2` such parameter can designate any of Level 2 (single-byte) encodings supported by the [FTS-5003.001](http://ftsc.org/docs/fts-5003.001) standard in Fidonet.
@@ -61,7 +61,7 @@ The application does one of the following:
 
 * If some tweets (microblog entries) appeared after the tweet that was read last time (that tweet's ID is stored in `fileLastRead`), these tweets become posted to `textOutput`.
 
-* If that file (designated by `fileLastRead`) does not exist, then `twi2fido` cannot determine how many last tweets to post. The default maximum is used: 64 last tweets are posted to `textOutput`.
+* If that file (designated by `fileLastRead`) does not exist, then `twi2fido` cannot determine how many last tweets to post. The default maximum is used: 60 last tweets are posted to `textOutput`.
 
 * If the microblog is empty or does not contain any entries newer than the last read, then the `textOutput` file is erased.
 

@@ -65,7 +65,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
 
    var tweeOptions = {
       // include_rts: false,
-      count: 64,
+      count: 60,
       screen_name: loginName
    };
    var lastRead = getLastReadFromFile(fileLastRead);
@@ -87,6 +87,48 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
       tweetList.forEach(function(tweet){
          var source = tweet.retweeted_status || tweet;
          var sourceText = source.text;
+
+         // expand URLs in `sourceText`:
+         if(
+            typeof source.entities !== 'undefined' &&
+            Array.isArray(source.entities.urls)
+         ){
+            source.entities.urls.forEach(function(objURL){
+               if(
+                  typeof objURL.url === 'string' &&
+                  typeof objURL.expanded_url === 'string' &&
+                  objURL.expanded_url.indexOf( objURL.url ) < 0
+               ){
+                  while( sourceText.indexOf(objURL.url) > -1 ){
+                     sourceText = sourceText.replace(
+                        objURL.url,
+                        objURL.expanded_url
+                     );
+                  }
+               }
+            });
+         }
+         if(
+            typeof source.entities !== 'undefined' &&
+            Array.isArray(source.entities.media)
+         ){
+            source.entities.media.forEach(function(mediaURL){
+               if(
+                  typeof mediaURL.url === 'string' &&
+                  typeof mediaURL.display_url === 'string' &&
+                  ('https://' + mediaURL.display_url).indexOf(
+                     mediaURL.url
+                  ) < 0
+               ){
+                  while( sourceText.indexOf(mediaURL.url) > -1 ){
+                     sourceText = sourceText.replace(
+                        mediaURL.url,
+                        'https://' + mediaURL.display_url
+                     );
+                  }
+               }
+            });
+         }
 
          content += [
             source.user.name,
