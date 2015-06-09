@@ -97,6 +97,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
                if(
                   typeof objURL.url === 'string' &&
                   typeof objURL.expanded_url === 'string' &&
+                  objURL.expanded_url.length <= 78 &&
                   objURL.expanded_url.indexOf( objURL.url ) < 0
                ){
                   while( sourceText.indexOf(objURL.url) > -1 ){
@@ -116,6 +117,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
                if(
                   typeof mediaURL.url === 'string' &&
                   typeof mediaURL.display_url === 'string' &&
+                  ('https://' + mediaURL.display_url).length <= 78 &&
                   ('https://' + mediaURL.display_url).indexOf(
                      mediaURL.url
                   ) < 0
