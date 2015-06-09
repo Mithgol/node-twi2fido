@@ -55,6 +55,8 @@ An optional parameter `"--CHRS=CP866 2"` is accepted before or after any of t
    * Instead of `CP866 2` such parameter can designate any of Level 2 (single-byte) encodings supported by the [FTS-5003.001](http://ftsc.org/docs/fts-5003.001) standard in Fidonet.
    * That single-byte encoding must also be supported by the [`iconv-lite`](https://github.com/ashtuchkin/iconv-lite) module. (Don't worry, most of them are supported.)
 
+An optional parameter `"--debug"` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk and instead writes raw JSON from Twitter to the console.
+
 The application does one of the following:
 
 * If some tweets (microblog entries) appeared after the tweet that was read last time (that tweet's ID is stored in `fileLastRead`), these tweets become posted to `textOutput`.

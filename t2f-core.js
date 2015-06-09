@@ -24,15 +24,15 @@ var eraseFile = function(filename){
    } catch(e) {}
 };
 
-module.exports = function(loginName, textOutput, fileLastRead, CHRS){
+module.exports = function(loginName, textOutput, fileLastRead, options){
    textOutput   = path.resolve(__dirname, textOutput);
    fileLastRead = path.resolve(__dirname, fileLastRead);
 
-   var spaceIDX = CHRS.indexOf(' ');
+   var spaceIDX = options.CHRS.indexOf(' ');
    if( spaceIDX < 0 ){
       console.log([
          'The given charset "',
-         CHRS,
+         options.CHRS,
          '" does not have an <encoding><whitespace><level> form.'
       ].join(''));
       console.log([
@@ -43,7 +43,7 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
       eraseFile(textOutput);
       process.exit(1);
    }
-   var encodingCHRS = CHRS.slice(0, spaceIDX);
+   var encodingCHRS = options.CHRS.slice(0, spaceIDX);
    if( !Buffer.isEncoding(encodingCHRS) ){
       console.log('The given encoding "' + encodingCHRS + '" is unknown.');
       console.log([
@@ -75,7 +75,10 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
       if( err ) throw new Error( util.inspect(err, { depth: null }) );
 
       var content = '';
-      // console.log( util.inspect(tweetList, { depth: null }) );
+      if( options.debug ){
+         console.log( util.inspect(tweetList, { depth: null }) );
+         process.exit();
+      }
       if( tweetList.length < 1 ){
          eraseFile(textOutput);
          console.log('Zero tweets received, output file erased.');
@@ -83,6 +86,7 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
       }
       tweetList.forEach(function(tweet){
          var source = tweet.retweeted_status || tweet;
+         var sourceText = source.text;
 
          content += [
             source.user.name,
@@ -101,7 +105,7 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
             '/status/',
             source.id_str,
             '\n\n',
-            source.text,
+            sourceText,
             '\n\n\n\n'
          ].join('');
       });
@@ -119,7 +123,7 @@ module.exports = function(loginName, textOutput, fileLastRead, CHRS){
                content
             ].join('');
          }
-         content = '\x01CHRS: ' + CHRS + '\n' + content;
+         content = '\x01CHRS: ' + options.CHRS + '\n' + content;
          if( !modeUTF8 ) content = fiunis.encode(content, encodingCHRS);
          fs.writeFileSync(textOutput, content);
          console.log(tweetList.length + ' tweet(s) written.');

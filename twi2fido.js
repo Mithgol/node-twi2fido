@@ -10,11 +10,17 @@ params.shift(); // 'node'
 params.shift(); // 'twi2fido'
 
 var CHRS = 'UTF-8 4';
+var debugMode = false;
 params = params.filter(function(nextParam){
-   if( nextParam.indexOf('--CHRS=') !== 0 ) return true;
+   if( nextParam.indexOf('--CHRS=') === 0 ){
+      CHRS = nextParam.slice('--CHRS='.length);
+      return false;
+   } else if( nextParam.toLowerCase() === '--debug' ){
+      debugMode = true;
+      return false;
+   }
 
-   CHRS = nextParam.slice('--CHRS='.length);
-   return false;
+   return true;
 });
 
 if( params.length < 1 ){
@@ -38,6 +44,11 @@ if( params.length < 1 ){
    clog('All of the FTS-5003.001 Level 2 character sets are supported');
    clog('as long as https://github.com/ashtuchkin/iconv-lite knows of them');
    clog('(usually it does).');
+   clog('');
+   clog('An optional "--debug" parameter (before or after any of the above)');
+   clog('switches twi2fido to the debug mode. The recent tweets are not');
+   clog('written to disk; instead of it, raw JSON data from Twitter becomes');
+   clog('written to the console.');
 } else if (params.length === 1) {
    loginName    = params[0];
    textOutput   = loginName + '.tweets.txt';
@@ -52,4 +63,7 @@ if( params.length < 1 ){
    fileLastRead = params[2];
 }
 
-twi2fido(loginName, textOutput, fileLastRead, CHRS);
+twi2fido(loginName, textOutput, fileLastRead, {
+   CHRS: CHRS,
+   debug: debugMode
+});
