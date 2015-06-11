@@ -84,6 +84,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          console.log('Zero tweets received, output file erased.');
          return;
       }
+      tweetList.reverse(); // undo reverse chronological order
       tweetList.forEach(function(tweet){
          var source = tweet.retweeted_status || tweet;
          var sourceText = source.text;
@@ -152,7 +153,8 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
             sourceText,
             '\n\n\n\n'
          ].join('');
-      });
+      }); // tweetList.forEach
+      tweetList.reverse(); // redo reverse chronological order
       // console.log(content);
       twi.get('users/show', {screen_name: loginName}, function(err, userdata){
          content = '\u00A0\n' + content;
