@@ -172,7 +172,12 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          content = '\x01CHRS: ' + options.CHRS + '\n' + content;
          if( !modeUTF8 ) content = fiunis.encode(content, encodingCHRS);
          fs.writeFileSync(textOutput, content);
-         console.log(tweetList.length + ' tweet(s) written.');
+         console.log([
+            tweetList.length,
+            ' tweet',
+            (tweetList.length > 1)? 's' : '',
+            ' written.'
+         ].join(''));
          fs.writeFileSync(fileLastRead, tweetList[0].id_str);
       });
    });
