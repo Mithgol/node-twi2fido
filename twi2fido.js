@@ -49,6 +49,7 @@ if( params.length < 1 ){
    clog('switches twi2fido to the debug mode. The recent tweets are not');
    clog('written to disk; instead of it, raw JSON data from Twitter becomes');
    clog('written to the console.');
+   process.exit(1);
 } else if (params.length === 1) {
    loginName    = params[0];
    textOutput   = loginName + '.tweets.txt';
