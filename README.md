@@ -2,7 +2,9 @@
 
 This application (`twi2fido`) aggregates microblog entries from Twitter and then prepares them for being posted to Fidonet. (Its name is derived from loosely abbreviated words “tweet to Fido”.)
 
-This application is written in JavaScript and requires [Node.js](http://nodejs.org/) to run. (Node.js version 0.10.x or 0.12.x is recommended. The latest stable [io.js](https://iojs.org/) is fine too.)
+This application is written in JavaScript and requires [Node.js](http://nodejs.org/) to run.
+* Currently only Node.js version 0.10.x or 0.12.x is supported.
+* The latest stable [io.js](https://iojs.org/) or Node v4.0.x are not supported because they are [not backwards-compatible](https://github.com/nodejs/node/issues/2835) with older interfaces currently used by [`iconv-lite`](https://www.npmjs.com/package/iconv-lite).
 
 ## Installing twi2fido
 
