@@ -3,7 +3,7 @@
 "bin": "./twi2fido.js",
 "preferGlobal": true,
 "main": "t2f-core.js",
-"version": "1.3.2",
+"version": "1.3.3",
 "description": "Aggregates microblog entries from Twitter and prepares them for being posted to Fidonet.",
 "keywords": ["Fidonet", "Fido", "Twitter"],
 "author": { "name": "Mithgol the Webmaster" },
@@ -13,7 +13,7 @@
    "url": "https://github.com/Mithgol/node-twi2fido.git"
 },
 "dependencies": {
-   "fiunis": "~2.1.1",
+   "fiunis": "~2.1.2",
    "moment": "~2.10.2",
    "simteconf": "~0.6.9",
    "twitter": "~1.2.5"
