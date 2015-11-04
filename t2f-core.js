@@ -1,10 +1,12 @@
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
+var escapeStringRegExp = require('escape-string-regexp');
 var fiunis = require('fiunis');
 var moment = require('moment');
 var simteconf = require('simteconf');
 var twitter = require('twitter');
+var XRegExp = require('xregexp');
 
 var config = simteconf( path.join(__dirname, 'twi2fido.config') );
 
@@ -56,6 +58,17 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
    }
    var modeUTF8 = (encodingCHRS === 'UTF-8' || encodingCHRS === 'UTF8');
 
+   var hashtagRegExp = null;
+   if( options.hashtags.length > 0 ){
+      hashtagRegExp = XRegExp([
+         '(?:',
+         options.hashtags.map(function(nextHashtag){
+            return escapeStringRegExp(nextHashtag);
+         }).join('|'),
+         ')(?=$|[^\\p{L}])'
+      ].join(''), 'g');
+   }
+
    var twi = new twitter({
       consumer_key:        config.last('ConsumerKey'),
       consumer_secret:     config.last('ConsumerSecret'),
@@ -64,7 +77,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
    });
 
    var tweeOptions = {
-      // include_rts: false,
+      // include_rts: false, ← can become a future setting!
       count: 60,
       screen_name: loginName
    };
@@ -79,6 +92,14 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          console.log( util.inspect(tweetList, { depth: null }) );
          process.exit();
       }
+      if( hashtagRegExp !== null ){
+         tweetList = tweetList.filter(function(nextTweet){
+            // same as in the iterator below:
+            var sourceText = ( nextTweet.retweeted_status || nextTweet ).text;
+
+            return hashtagRegExp.test(sourceText);
+         });
+      }
       if( tweetList.length < 1 ){
          eraseFile(textOutput);
          console.log('Zero tweets received, output file erased.');
@@ -86,6 +107,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
       }
       tweetList.reverse(); // undo reverse chronological order
       tweetList.forEach(function(tweet){
+         // same as in the filter above:
          var source = tweet.retweeted_status || tweet;
          var sourceText = source.text;
 

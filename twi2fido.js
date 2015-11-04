@@ -10,10 +10,23 @@ params.shift(); // 'node'
 params.shift(); // 'twi2fido'
 
 var CHRS = 'UTF-8 4';
+var hashtags = [];
 var debugMode = false;
 params = params.filter(function(nextParam){
    if( nextParam.indexOf('--CHRS=') === 0 ){
       CHRS = nextParam.slice('--CHRS='.length);
+      return false;
+   } else if( nextParam.indexOf('--hashtag=') === 0 ){
+      hashtags = nextParam.slice(
+         '--hashtag='.length
+      ).split(',').map(function(nextChunk){
+         return nextChunk.trim();
+      }).filter(function(nextChunk){
+         return nextChunk.length > 0;
+      }).map(function(nextChunk){
+         if( nextChunk.indexOf('#') === 0 ) return nextChunk;
+         return '#' + nextChunk;
+      });
       return false;
    } else if( nextParam.toLowerCase() === '--debug' ){
       debugMode = true;
@@ -45,6 +58,12 @@ if( params.length < 1 ){
    clog('as long as https://github.com/ashtuchkin/iconv-lite knows of them');
    clog('(usually it does).');
    clog('');
+   clog('An optional "--hashtag=..." parameter (before or after any of the');
+   clog('above) enables filtering by Twitter hashtags. Several hashtags');
+   clog('(separated by commas) may be given. Only the tweets that contain');
+   clog('at least one of the given hashtags are published. Example:');
+   clog('--hashtag=anime,manga,vn');
+   clog('');
    clog('An optional "--debug" parameter (before or after any of the above)');
    clog('switches twi2fido to the debug mode. The recent tweets are not');
    clog('written to disk; instead of it, raw JSON data from Twitter becomes');
@@ -64,7 +83,10 @@ if( params.length < 1 ){
    fileLastRead = params[2];
 }
 
+if( hashtags.length > 0 ) clog('Hashtags: ' + hashtags.join(', ') + '.');
+
 twi2fido(loginName, textOutput, fileLastRead, {
    CHRS: CHRS,
-   debug: debugMode
+   debug: debugMode,
+   hashtags: hashtags
 });
