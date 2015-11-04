@@ -92,6 +92,8 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          console.log( util.inspect(tweetList, { depth: null }) );
          process.exit();
       }
+      fs.writeFileSync(fileLastRead, tweetList[0].id_str);
+
       if( hashtagRegExp !== null ){
          tweetList = tweetList.filter(function(nextTweet){
             // same as in the iterator below:
@@ -175,9 +177,8 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
             sourceText,
             '\n\n\n\n'
          ].join('');
-      }); // tweetList.forEach
-      tweetList.reverse(); // redo reverse chronological order
-      // console.log(content);
+      }); // tweetList.forEach conversion to `content` finished
+
       twi.get('users/show', {screen_name: loginName}, function(err, userdata){
          content = '\u00A0\n' + content;
          if( !err && typeof userdata.profile_image_url_https === 'string' ){
@@ -200,7 +201,6 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
             (tweetList.length > 1)? 's' : '',
             ' written.'
          ].join(''));
-         fs.writeFileSync(fileLastRead, tweetList[0].id_str);
       });
    });
 };
