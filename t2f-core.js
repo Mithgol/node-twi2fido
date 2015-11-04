@@ -92,7 +92,9 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          console.log( util.inspect(tweetList, { depth: null }) );
          process.exit();
       }
-      fs.writeFileSync(fileLastRead, tweetList[0].id_str);
+      if( tweetList.length > 0 ){ // length before filtering
+         fs.writeFileSync(fileLastRead, tweetList[0].id_str);
+      }
 
       if( hashtagRegExp !== null ){
          tweetList = tweetList.filter(function(nextTweet){
@@ -102,7 +104,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
             return hashtagRegExp.test(sourceText);
          });
       }
-      if( tweetList.length < 1 ){
+      if( tweetList.length < 1 ){ // length after filtering
          eraseFile(textOutput);
          console.log('Zero tweets received, output file erased.');
          return;
