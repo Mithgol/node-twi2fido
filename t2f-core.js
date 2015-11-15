@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
+var cl = require('ciel');
 var escapeStringRegExp = require('escape-string-regexp');
 var fiunis = require('fiunis');
 var moment = require('moment');
@@ -32,12 +33,12 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
 
    var spaceIDX = options.CHRS.indexOf(' ');
    if( spaceIDX < 0 ){
-      console.log([
+      cl.fail([
          'The given charset "',
          options.CHRS,
          '" does not have an <encoding><whitespace><level> form.'
       ].join(''));
-      console.log([
+      cl.fail([
          'The standard ',
          'http://ftsc.org/docs/fts-5003.001',
          ' does not currently recommend it.'
@@ -47,8 +48,8 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
    }
    var encodingCHRS = options.CHRS.slice(0, spaceIDX);
    if( !Buffer.isEncoding(encodingCHRS) ){
-      console.log('The given encoding "' + encodingCHRS + '" is unknown.');
-      console.log([
+      cl.fail('The given encoding "' + encodingCHRS + '" is unknown.');
+      cl.fail([
          'The module ',
          'https://github.com/ashtuchkin/iconv-lite',
          ' does not support it.'
@@ -106,7 +107,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
       }
       if( tweetList.length < 1 ){ // length after filtering
          eraseFile(textOutput);
-         console.log('Zero tweets received, output file erased.');
+         cl.skip('Zero tweets received, output file erased.');
          return;
       }
       tweetList.reverse(); // undo reverse chronological order
@@ -197,7 +198,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          content = '\x01CHRS: ' + options.CHRS + '\n' + content;
          if( !modeUTF8 ) content = fiunis.encode(content, encodingCHRS);
          fs.writeFileSync(textOutput, content);
-         console.log([
+         cl.ok([
             tweetList.length,
             ' tweet',
             (tweetList.length > 1)? 's' : '',

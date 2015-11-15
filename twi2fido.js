@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var twi2fido = require('./t2f-core.js');
+var cl = require('ciel');
 var clog = console.log;
 
 var loginName, textOutput, fileLastRead;
@@ -83,7 +84,7 @@ if( params.length < 1 ){
    fileLastRead = params[2];
 }
 
-if( hashtags.length > 0 ) clog('Hashtags: ' + hashtags.join(', ') + '.');
+if( hashtags.length > 0 ) cl.status('Hashtags: ' + hashtags.join(', ') + '.');
 
 twi2fido(loginName, textOutput, fileLastRead, {
    CHRS: CHRS,
