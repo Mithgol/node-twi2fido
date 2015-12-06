@@ -67,7 +67,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
             return escapeStringRegExp(nextHashtag);
          }).join('|'),
          ')(?=$|[^\\p{L}])'
-      ].join(''), 'g');
+      ].join(''), 'gi');
    }
 
    var twi = new twitter({
