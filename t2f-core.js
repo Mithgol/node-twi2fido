@@ -59,16 +59,15 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
    }
    var modeUTF8 = (encodingCHRS === 'UTF-8' || encodingCHRS === 'UTF8');
 
-   var hashtagRegExp = null;
-   if( options.hashtags.length > 0 ){
-      hashtagRegExp = XRegExp([
+   var getHashtagRegExp = function(hashtags){
+      return XRegExp([
          '(?:',
-         options.hashtags.map(function(nextHashtag){
+         hashtags.map(function(nextHashtag){
             return escapeStringRegExp(nextHashtag);
          }).join('|'),
          ')(?=$|[^\\p{L}])'
       ].join(''), 'gi');
-   }
+   };
 
    var twi = new twitter({
       consumer_key:        config.last('ConsumerKey'),
@@ -97,12 +96,12 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          fs.writeFileSync(fileLastRead, tweetList[0].id_str);
       }
 
-      if( hashtagRegExp !== null ){
+      if( options.hashtags.length > 0 ){
          tweetList = tweetList.filter(function(nextTweet){
             // same as in the iterator below:
             var sourceText = ( nextTweet.retweeted_status || nextTweet ).text;
 
-            return hashtagRegExp.test(sourceText);
+            return getHashtagRegExp(options.hashtags).test(sourceText);
          });
       }
       if( tweetList.length < 1 ){ // length after filtering
