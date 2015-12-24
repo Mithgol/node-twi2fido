@@ -57,7 +57,7 @@ An optional parameter `"--CHRS=CP866 2"` is accepted before or after any of t
 
 An optional parameter `"--hashtag=..."` parameter is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` writes only the tweets that contain at least one of the given hashtags. Several hashtags (separated by commas) may be given. (Example: `--hashtag=anime,manga,vn`.) The character `#` is optional before hashtags (it'll be added automatically if omitted in the command line).
 
-An optional parameter `"--debug"` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk and instead writes raw JSON from Twitter to the console.
+An optional parameter `"--debug"` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk and instead writes raw JSON from Twitter to the console. (The output file is erased only if a fatal error happens before `twi2fido` gets the tweets; for example, if the `"--CHRS=…"` parameter is malformed or an unknown encoding is given in it.)
 
 The application does one of the following:
 
