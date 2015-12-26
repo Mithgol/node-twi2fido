@@ -87,7 +87,6 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
    twi.get('statuses/user_timeline', tweeOptions, function(err, tweetList){
       if( err ) throw new Error( util.inspect(err, { depth: null }) );
 
-      var content = '';
       if( options.debug ){
          console.log( util.inspect(tweetList, { depth: null }) );
          process.exit();
@@ -110,62 +109,48 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          return;
       }
       tweetList.reverse(); // undo reverse chronological order
-      tweetList.forEach(function(tweet){
+      var content = tweetList.reduce(function(prevContent, tweet){
          // same as in the filter above:
          var source = tweet.retweeted_status || tweet;
          var sourceText = source.text;
 
-         // expand URLs in `sourceText`:
+         // expand simple URLs in `sourceText`:
          if(
             typeof source.entities !== 'undefined' &&
             Array.isArray(source.entities.urls)
-         ){
-            source.entities.urls.forEach(function(objURL){
-               if(
-                  typeof objURL.url === 'string' &&
-                  typeof objURL.expanded_url === 'string' &&
-                  objURL.expanded_url.length <= 78 &&
-                  objURL.expanded_url.indexOf( objURL.url ) < 0
-               ){
-                  while( sourceText.indexOf(objURL.url) > -1 ){
-                     sourceText = sourceText.replace(
-                        objURL.url,
-                        objURL.expanded_url
-                     );
-                  }
-               }
-            });
-         }
+         ) sourceText = source.entities.urls.reduce(function(txt, objURL){
+            if(
+               typeof objURL.url === 'string' &&
+               typeof objURL.expanded_url === 'string' &&
+               objURL.expanded_url.length <= 78
+            ) return txt.split(objURL.url).join(objURL.expanded_url);
+
+            return txt;
+         }, sourceText);
+
+         // expand media URLs in `sourceText`:
          if(
-            typeof source.entities !== 'undefined' &&
-            Array.isArray(source.entities.media)
-         ){
-            source.entities.media.forEach(function(mediaURL){
+            typeof source.extended_entities !== 'undefined' &&
+            Array.isArray(source.extended_entities.media)
+         ) sourceText = source.extended_entities.media.reduce(
+            function(txt, mediaURL){
                if(
                   typeof mediaURL.url === 'string' &&
                   typeof mediaURL.display_url === 'string' &&
-                  ('https://' + mediaURL.display_url).length <= 78 &&
-                  ('https://' + mediaURL.display_url).indexOf(
-                     mediaURL.url
-                  ) < 0
+                  ('https://' + mediaURL.display_url).length <= 78
                ){
-                  while( sourceText.indexOf(mediaURL.url) > -1 ){
-                     sourceText = sourceText.replace(
-                        mediaURL.url,
-                        'https://' + mediaURL.display_url
-                     );
-                  }
-               }
-            });
-         }
+                  var frags = txt.split(mediaURL.url);
+                  return frags.join('https://' + mediaURL.display_url);
+               } else return txt;
+            },
+            sourceText
+         );
 
-         content += [
+         return prevContent + [
             source.user.name,
             ' (@',
             source.user.screen_name,
             ') ',
-            // source.created_at,
-            // '\n',
             moment(
                source.created_at,
                'ddd MMM DD HH:mm:ss ZZ YYYY'
@@ -179,7 +164,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
             sourceText,
             '\n\n\n\n'
          ].join('');
-      }); // tweetList.forEach conversion to `content` finished
+      }, ''); // tweetList.reduce conversion to `content` finished
 
       twi.get('users/show', {screen_name: loginName}, function(err, userdata){
          content = '\u00A0\n' + content;
