@@ -11,7 +11,7 @@ var XRegExp = require('xregexp');
 
 var config = simteconf( path.join(__dirname, 'twi2fido.config') );
 
-var getLastReadFromFile = function(filename){
+var getLastReadFromFile = filename => {
    try {
       var readData = fs.readFileSync(filename, {encoding: 'utf8'});
       if( /^\s*$/.test(readData) ) return null;
@@ -21,26 +21,24 @@ var getLastReadFromFile = function(filename){
    }
 };
 
-var eraseFile = function(filename){
+var eraseFile = filename => {
    try {
       fs.unlinkSync(filename);
    } catch(e) {}
 };
 
-module.exports = function(loginName, textOutput, fileLastRead, options){
+module.exports = (loginName, textOutput, fileLastRead, options) => {
    textOutput   = path.resolve(__dirname, textOutput);
    fileLastRead = path.resolve(__dirname, fileLastRead);
 
    var spaceIDX = options.CHRS.indexOf(' ');
    if( spaceIDX < 0 ){
       cl.fail([
-         'The given charset "',
-         options.CHRS,
-         '" does not have an <encoding><whitespace><level> form.'
+         `The given charset "${options.CHRS}"`,
+         ' does not have an <encoding><whitespace><level> form.'
       ].join(''));
       cl.fail([
-         'The standard ',
-         'http://ftsc.org/docs/fts-5003.001',
+         'The standard http://ftsc.org/docs/fts-5003.001',
          ' does not currently recommend it.'
       ].join(''));
       eraseFile(textOutput);
@@ -48,10 +46,9 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
    }
    var encodingCHRS = options.CHRS.slice(0, spaceIDX);
    if( !Buffer.isEncoding(encodingCHRS) ){
-      cl.fail('The given encoding "' + encodingCHRS + '" is unknown.');
+      cl.fail(`The given encoding "${encodingCHRS}" is unknown.`);
       cl.fail([
-         'The module ',
-         'https://github.com/ashtuchkin/iconv-lite',
+         'The module https://github.com/ashtuchkin/iconv-lite',
          ' does not support it.'
       ].join(''));
       eraseFile(textOutput);
@@ -59,15 +56,13 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
    }
    var modeUTF8 = (encodingCHRS === 'UTF-8' || encodingCHRS === 'UTF8');
 
-   var getHashtagRegExp = function(hashtags){
-      return XRegExp([
-         '(?:',
-         hashtags.map(function(nextHashtag){
-            return escapeStringRegExp(nextHashtag);
-         }).join('|'),
-         ')(?=$|[^\\p{L}])'
-      ].join(''), 'gi');
-   };
+   var getHashtagRegExp = hashtags => XRegExp([
+      '(?:',
+      hashtags.map(
+         nextHashtag => escapeStringRegExp(nextHashtag)
+      ).join('|'),
+      ')(?=$|[^\\p{L}])'
+   ].join(''), 'gi');
 
    var twi = new twitter({
       consumer_key:        config.last('ConsumerKey'),
@@ -84,7 +79,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
    var lastRead = getLastReadFromFile(fileLastRead);
    if( lastRead !== null ) tweeOptions.since_id = lastRead;
 
-   twi.get('statuses/user_timeline', tweeOptions, function(err, tweetList){
+   twi.get('statuses/user_timeline', tweeOptions, (err, tweetList) => {
       if( err ) throw new Error( util.inspect(err, { depth: null }) );
 
       if( options.debug ){
@@ -109,7 +104,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          return;
       }
       tweetList.reverse(); // undo reverse chronological order
-      var content = tweetList.reduce(function(prevContent, tweet){
+      var content = tweetList.reduce((prevContent, tweet) => {
          // same as in the filter above:
          var source = tweet.retweeted_status || tweet;
          var sourceText = source.text;
@@ -118,7 +113,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          if(
             typeof source.entities !== 'undefined' &&
             Array.isArray(source.entities.urls)
-         ) sourceText = source.entities.urls.reduce(function(txt, objURL){
+         ) sourceText = source.entities.urls.reduce((txt, objURL) => {
             if(
                typeof objURL.url === 'string' &&
                typeof objURL.expanded_url === 'string' &&
@@ -133,7 +128,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
             typeof source.extended_entities !== 'undefined' &&
             Array.isArray(source.extended_entities.media)
          ) sourceText = source.extended_entities.media.reduce(
-            function(txt, mediaURL){
+            (txt, mediaURL) => {
                if(
                   typeof mediaURL.url === 'string' &&
                   typeof mediaURL.display_url === 'string' &&
@@ -166,7 +161,7 @@ module.exports = function(loginName, textOutput, fileLastRead, options){
          ].join('');
       }, ''); // tweetList.reduce conversion to `content` finished
 
-      twi.get('users/show', {screen_name: loginName}, function(err, userdata){
+      twi.get('users/show', {screen_name: loginName}, (err, userdata) => {
          content = '\u00A0\n' + content;
          if( !err && typeof userdata.profile_image_url_https === 'string' ){
             content = [

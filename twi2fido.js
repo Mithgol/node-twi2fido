@@ -13,21 +13,16 @@ params.shift(); // 'twi2fido'
 var CHRS = 'UTF-8 4';
 var hashtags = [];
 var debugMode = false;
-params = params.filter(function(nextParam){
-   if( nextParam.indexOf('--CHRS=') === 0 ){
+params = params.filter(nextParam => {
+   if( nextParam.startsWith('--CHRS=') ){
       CHRS = nextParam.slice('--CHRS='.length);
       return false;
-   } else if( nextParam.indexOf('--hashtag=') === 0 ){
-      hashtags = nextParam.slice(
-         '--hashtag='.length
-      ).split(',').map(function(nextChunk){
-         return nextChunk.trim();
-      }).filter(function(nextChunk){
-         return nextChunk.length > 0;
-      }).map(function(nextChunk){
-         if( nextChunk.indexOf('#') === 0 ) return nextChunk;
-         return '#' + nextChunk;
-      });
+   } else if( nextParam.startsWith('--hashtag=') ){
+      hashtags = nextParam.slice( '--hashtag='.length ).split(',').map(
+         nextChunk => nextChunk.trim()
+      ).filter( nextChunk => nextChunk.length > 0 ).map(
+         nextChunk => nextChunk.startsWith('#') ? nextChunk : ('#'+nextChunk)
+      );
       return false;
    } else if( nextParam.toLowerCase() === '--debug' ){
       debugMode = true;
