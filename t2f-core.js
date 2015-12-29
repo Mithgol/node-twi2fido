@@ -27,6 +27,25 @@ var eraseFile = filename => {
    } catch(e) {}
 };
 
+var getShortImageRune = (imageURL, linkURL) => {
+   var limit = 78;
+   var rune;
+
+   // step 1, almost always fails
+   rune = `[![(image)](${imageURL})](${linkURL})`;
+   if(!( rune.split('\n').some( line => line.length > limit ) )) return rune;
+
+   // step 2, almost always works
+   rune = `[![(image)](${imageURL})\n](${linkURL})`;
+   if(!( rune.split('\n').some( line => line.length > limit ) )) return rune;
+
+   // step 3, should always work
+   rune = `[![(image)\n](${imageURL})\n](${linkURL})`;
+   if(!( rune.split('\n').some( line => line.length > limit ) )) return rune;
+
+   return null; // URLs too large
+};
+
 module.exports = (loginName, textOutput, fileLastRead, options) => {
    textOutput   = path.resolve(__dirname, textOutput);
    fileLastRead = path.resolve(__dirname, fileLastRead);
@@ -140,10 +159,13 @@ module.exports = (loginName, textOutput, fileLastRead, options) => {
                      frags[frags.length-1] === '' &&
                      mediaURL.type === 'photo'
                   ){
-                     var photoURL = mediaURL.media_url_https;
-                     frags.pop();
-                     frags[frags.length-1] += '\n\n[![(иллюстрация)]' +
-                        `(${photoURL})](${HTTPSURL})`;
+                     var rune = getShortImageRune(
+                        mediaURL.media_url_https, HTTPSURL
+                     );
+                     if( rune !== null ){
+                        frags.pop();
+                        frags[frags.length-1] += '\n\n' + rune;
+                     }
                   }
                   return frags.join(HTTPSURL);
                } else return txt;
