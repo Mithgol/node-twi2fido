@@ -134,8 +134,18 @@ module.exports = (loginName, textOutput, fileLastRead, options) => {
                   typeof mediaURL.display_url === 'string' &&
                   ('https://' + mediaURL.display_url).length <= 78
                ){
+                  var HTTPSURL = 'https://' + mediaURL.display_url;
                   var frags = txt.split(mediaURL.url);
-                  return frags.join('https://' + mediaURL.display_url);
+                  if(
+                     frags[frags.length-1] === '' &&
+                     mediaURL.type === 'photo'
+                  ){
+                     var photoURL = mediaURL.media_url_https;
+                     frags.pop();
+                     frags[frags.length-1] += '\n\n[![(иллюстрация)]' +
+                        `(${photoURL})](${HTTPSURL})`;
+                  }
+                  return frags.join(HTTPSURL);
                } else return txt;
             },
             sourceText
