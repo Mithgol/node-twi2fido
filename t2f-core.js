@@ -147,7 +147,7 @@ module.exports = (loginName, textOutput, fileLastRead, options) => {
             typeof source.extended_entities !== 'undefined' &&
             Array.isArray(source.extended_entities.media)
          ) sourceText = source.extended_entities.media.reduce(
-            (txt, mediaURL) => {
+            (txt, mediaURL, mediaIDX, arrMediaURLs) => {
                if(
                   typeof mediaURL.url === 'string' &&
                   typeof mediaURL.display_url === 'string' &&
@@ -156,15 +156,21 @@ module.exports = (loginName, textOutput, fileLastRead, options) => {
                   var HTTPSURL = 'https://' + mediaURL.display_url;
                   var frags = txt.split(mediaURL.url);
                   if(
+                     frags.length > 1 &&
                      frags[frags.length-1] === '' &&
                      mediaURL.type === 'photo'
                   ){
-                     var rune = getShortImageRune(
-                        mediaURL.media_url_https, HTTPSURL
-                     );
-                     if( rune !== null ){
+                     var imageRunes = arrMediaURLs.filter(nextMediaURL =>
+                        nextMediaURL.display_url === mediaURL.display_url
+                     ).map(nextMediaURL => getShortImageRune(
+                        nextMediaURL.media_url_https, HTTPSURL
+                     )).filter(nextRune => nextRune !== null);
+
+                     if( imageRunes.length > 0 ){
                         frags.pop();
-                        frags[frags.length-1] += '\n\n' + rune;
+                        frags[frags.length-1] += '\n\n' + imageRunes.join(
+                           '\n\n'
+                        );
                      }
                   }
                   return frags.join(HTTPSURL);
