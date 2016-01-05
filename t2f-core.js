@@ -46,9 +46,10 @@ var getShortImageRune = (imageURL, linkURL) => {
    return null; // URLs too large
 };
 
-module.exports = (loginName, textOutput, fileLastRead, options) => {
-   textOutput   = path.resolve(__dirname, textOutput);
-   fileLastRead = path.resolve(__dirname, fileLastRead);
+module.exports = (loginName, options) => {
+   var textOutput   = path.resolve(__dirname, options.textOutput);
+   var fileLastRead = path.resolve(__dirname, options.fileLastRead);
+   var debugOutput  = path.resolve(__dirname, 'debug.json');
 
    var spaceIDX = options.CHRS.indexOf(' ');
    if( spaceIDX < 0 ){
@@ -60,7 +61,7 @@ module.exports = (loginName, textOutput, fileLastRead, options) => {
          'The standard http://ftsc.org/docs/fts-5003.001',
          ' does not currently recommend it.'
       ].join(''));
-      eraseFile(textOutput);
+      if(!( options.debug )) eraseFile(textOutput);
       process.exit(1);
    }
    var encodingCHRS = options.CHRS.slice(0, spaceIDX);
@@ -70,7 +71,7 @@ module.exports = (loginName, textOutput, fileLastRead, options) => {
          'The module https://github.com/ashtuchkin/iconv-lite',
          ' does not support it.'
       ].join(''));
-      eraseFile(textOutput);
+      if(!( options.debug )) eraseFile(textOutput);
       process.exit(1);
    }
    var modeUTF8 = (encodingCHRS === 'UTF-8' || encodingCHRS === 'UTF8');
@@ -95,14 +96,19 @@ module.exports = (loginName, textOutput, fileLastRead, options) => {
       count: 60,
       screen_name: loginName
    };
-   var lastRead = getLastReadFromFile(fileLastRead);
-   if( lastRead !== null ) tweeOptions.since_id = lastRead;
+   if(!( options.debug )){
+      var lastRead = getLastReadFromFile(fileLastRead);
+      if( lastRead !== null ) tweeOptions.since_id = lastRead;
+   }
 
    twi.get('statuses/user_timeline', tweeOptions, (err, tweetList) => {
       if( err ) throw new Error( util.inspect(err, { depth: null }) );
 
       if( options.debug ){
-         console.log( util.inspect(tweetList, { depth: null }) );
+         fs.writeFileSync(
+            debugOutput, util.inspect(tweetList, { depth: null })
+         );
+         cl.ok('Debug output has been written: ' + debugOutput);
          process.exit();
       }
       if( tweetList.length > 0 ){ // length before filtering

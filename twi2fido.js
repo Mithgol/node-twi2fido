@@ -63,7 +63,7 @@ if( params.length < 1 ){
    clog('An optional "--debug" parameter (before or after any of the above)');
    clog('switches twi2fido to the debug mode. The recent tweets are not');
    clog('written to disk; instead of it, raw JSON data from Twitter becomes');
-   clog('written to the console.');
+   clog('written to the file debug.json in the directory of twi2fido.');
    process.exit(1);
 } else if (params.length === 1) {
    loginName    = params[0];
@@ -81,7 +81,9 @@ if( params.length < 1 ){
 
 if( hashtags.length > 0 ) cl.status('Hashtags: ' + hashtags.join(', ') + '.');
 
-twi2fido(loginName, textOutput, fileLastRead, {
+twi2fido(loginName, {
+   textOutput: textOutput,
+   fileLastRead: fileLastRead,
    CHRS: CHRS,
    debug: debugMode,
    hashtags: hashtags
