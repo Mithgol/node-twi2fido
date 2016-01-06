@@ -174,7 +174,11 @@ module.exports = (loginName, options) => {
 
                      if( imageRunes.length > 0 ){
                         frags.pop();
-                        frags[frags.length-1] += '\n\n' + imageRunes.join(
+                        var separuner = '\n\n';
+                        if(
+                           frags.length === 1 && frags[0] === ''
+                        ) separuner = '';
+                        frags[frags.length-1] += separuner + imageRunes.join(
                            '\n\n'
                         );
                      }
