@@ -53,10 +53,10 @@ module.exports = (loginName, options) => {
 
    var spaceIDX = options.CHRS.indexOf(' ');
    if( spaceIDX < 0 ){
-      cl.fail([
-         `The given charset "${options.CHRS}"`,
-         ' does not have an <encoding><whitespace><level> form.'
-      ].join(''));
+      cl.fail(
+         `The given charset "${options.CHRS
+         }" does not have an <encoding><whitespace><level> form.`
+      );
       cl.fail([
          'The standard http://ftsc.org/docs/fts-5003.001',
          ' does not currently recommend it.'
@@ -222,7 +222,8 @@ module.exports = (loginName, options) => {
                content
             ].join('');
          }
-         content = '\x01CHRS: ' + options.CHRS + '\n' + content;
+         content = `\x01CHRS: ${options.CHRS
+            }\n\x01SOURCESITE: Twitter\n${content}`;
          if( !modeUTF8 ) content = fiunis.encode(content, encodingCHRS);
          fs.writeFileSync(textOutput, content);
          cl.ok([
