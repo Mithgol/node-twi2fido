@@ -55,6 +55,7 @@ It uses the following parameters:
 An optional parameter `"--CHRS=CP866 2"` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` writes tweets in the given encoding instead of the default UTF-8 encoding.
    * Instead of `CP866 2` such parameter can designate any of Level 2 (single-byte) encodings supported by the [FTS-5003.001](http://ftsc.org/docs/fts-5003.001) standard in Fidonet.
    * That single-byte encoding must also be supported by the [`iconv-lite`](https://github.com/ashtuchkin/iconv-lite) module. (Don't worry, most of them are supported.)
+   * The corresponding `CHRS` kludge is added to the output message exactly as the [FTS-5003.001](http://ftsc.org/docs/fts-5003.001) standard dictates.
 
 An optional parameter `"--hashtag=..."` parameter is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` writes only the tweets that contain at least one of the given hashtags. Several hashtags (separated by commas) may be given. (Example: `--hashtag=anime,manga,vn`.) The character `#` is optional before hashtags (it'll be added automatically if omitted in the command line).
 
@@ -87,6 +88,16 @@ In the text of the tweet,
 * if a picture or several pictures are attached to the tweet, then they are displayed after the text of the tweet (instead of their short `t.co` URL), separated by single empty lines. (Each picture is represented by a Fidonet Rune of a hyperlink that leads to `pic.twitter.com` URL of the picture; that link's anchor is the picture itself. Additional linebreaks may be inserted to ensure that each line of the rune is not longer than 78 characters.)
 
 Three empty lines separate individual tweets from each other.
+
+#### Kludges
+
+The output text is prepended by the following Fidonet kludges:
+
+* The `CHRS` kludge specifying the encoding charset (see above), given by the `"--CHRS=..."` parameter (or UTF-8 charset by default). Adheres to the [FTS-5003.001](http://ftsc.org/docs/fts-5003.001) standard.
+
+* The `AVATAR` kludge containing the URL of the avatar of the given Twitter's user. Adheres to the Fidonet avatars' standard (see the [Fidonet JAM](https://github.com/Mithgol/node-fidonet-jam) repository).
+
+* The `SOURCESITE: Twitter` kludge (i.e. the kludge `SOURCESITE` with the value `Twitter`). There is no corresponding standard, but such a mark might help to prevent reposts (back to Twitter) by applications that post messages to the opposite direction (from Fidonet to Twitter).
 
 ### Posting the output text to Fidonet
 
