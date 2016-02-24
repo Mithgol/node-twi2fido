@@ -19,7 +19,7 @@
    "moment": "~2.11.2",
    "simteconf": "~0.6.9",
    "twitter": "~1.2.5",
-   "xregexp": "~3.0.0"
+   "xregexp": "~3.1.0"
 },
 "scripts": {
    "test": "jshint --verbose twi2fido.js t2f-core.js"
