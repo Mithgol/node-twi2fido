@@ -16,6 +16,7 @@
    "ciel": "~0.2.0",
    "escape-string-regexp": "~1.0.3",
    "fiunis": "~2.1.2",
+   "iconv-lite": "~0.4.13",
    "moment": "~2.12.0",
    "simteconf": "~0.6.9",
    "twitter": "~1.2.5",

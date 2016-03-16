@@ -4,6 +4,7 @@ var util = require('util');
 var cl = require('ciel');
 var escapeStringRegExp = require('escape-string-regexp');
 var fiunis = require('fiunis');
+var iconv = require('iconv-lite');
 var moment = require('moment');
 var simteconf = require('simteconf');
 var twitter = require('twitter');
@@ -65,7 +66,7 @@ module.exports = (loginName, options) => {
       process.exit(1);
    }
    var encodingCHRS = options.CHRS.slice(0, spaceIDX);
-   if( !Buffer.isEncoding(encodingCHRS) ){
+   if(!( iconv.encodingExists(encodingCHRS) )){
       cl.fail(`The given encoding "${encodingCHRS}" is unknown.`);
       cl.fail([
          'The module https://github.com/ashtuchkin/iconv-lite',
