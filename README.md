@@ -1,6 +1,6 @@
 [![(a histogram of downloads)](https://nodei.co/npm-dl/twi2fido.png?height=3)](https://npmjs.org/package/twi2fido)
 
-This application (`twi2fido`) aggregates microblog entries from Twitter and then prepares them for being posted to Fidonet. (Its name is derived from loosely abbreviated words “tweet to Fido”.)
+This application (`twi2fido`) aggregates microblog entries from Twitter and then prepares them for being posted to Fidonet. (Its name is derived from loosely abbreviated words “tweet to Fido”. It does not imply any endorsement, sponsorship, or association with Twitter.)
 
 This application is written in JavaScript and requires [Node.js](http://nodejs.org/) to run.
    * Starting from v2.0.0, this module requires Node.js version 4.2.2 or newer.
