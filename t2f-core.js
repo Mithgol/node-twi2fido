@@ -95,6 +95,7 @@ module.exports = (loginName, options) => {
    var tweeOptions = {
       // include_rts: false, ← can become a future setting!
       count: 60,
+      include_ext_alt_text: true,
       screen_name: loginName
    };
    if(!( options.debug )){
