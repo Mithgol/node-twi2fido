@@ -31,7 +31,7 @@ var eraseFile = filename => {
 var shortAltText = srcAltText => {
    var limit = 73; // limit of `getShortImageRune` minus `'[![()'.length`
    var textParts = srcAltText.split(' ');
-   if( textParts.length < 2 ) return srcAltText; // single word
+   if( textParts.length < 2 ) return `(${srcAltText})`; // single word
 
    textParts[0] = [ textParts[0] ];
    var recon = textParts.reduce((prevArray, nextChunk) => {
