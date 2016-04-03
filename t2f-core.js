@@ -28,41 +28,29 @@ var eraseFile = filename => {
    } catch(e) {}
 };
 
-var shortAltText = srcAltText => {
-   var limit = 73; // limit of `getShortImageRune` minus `'[![()'.length`
-   var textParts = srcAltText.split(' ');
-   if( textParts.length < 2 ) return `(${srcAltText})`; // single word
-
-   textParts[0] = [ textParts[0] ];
-   var recon = textParts.reduce((prevArray, nextChunk) => {
-      var concat = prevArray[prevArray.length-1] + ' ' + nextChunk;
-      if( concat.length > limit ){
-         prevArray.push(nextChunk);
-         return prevArray;
-      }
-      prevArray[prevArray.length-1] = concat;
-      return prevArray;
-   }).join('\n');
-   return `(${recon})`;
-};
-
 var getShortImageRune = (imageURL, linkURL, srcAltText) => {
    var limit = 78; // limit of `shortAltText` plus `'[![()'.length`
    var rune;
    var altText = '(image)';
-   if( typeof srcAltText === 'string' ) altText = shortAltText(srcAltText);
+   if( typeof srcAltText === 'string' ) altText = `(${srcAltText})`;
 
    // step 1, almost always fails
    rune = `[![${altText}](${imageURL})](${linkURL})`;
-   if(!( rune.split('\n').some( line => line.length > limit ) )) return rune;
+   if(
+      rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
+   ) return rune;
 
    // step 2, almost always works
    rune = `[![${altText}](${imageURL})\n](${linkURL})`;
-   if(!( rune.split('\n').some( line => line.length > limit ) )) return rune;
+   if(
+      rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
+   ) return rune;
 
    // step 3, should always work
    rune = `[![${altText}\n](${imageURL})\n](${linkURL})`;
-   if(!( rune.split('\n').some( line => line.length > limit ) )) return rune;
+   if(
+      rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
+   ) return rune;
 
    return null; // URLs too large
 };
