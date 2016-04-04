@@ -85,7 +85,7 @@ In the text of the tweet,
 
 * short `t.co` URLs are conveted back to long original URLs (unless they were longer than 78 characters),
 
-* if a picture or several pictures are attached to the tweet, then they are displayed after the text of the tweet (instead of their short `t.co` URL), separated by single empty lines. (Each picture is represented by a Fidonet Rune of a hyperlink that leads to `pic.twitter.com` URL of the picture; that link's anchor is the picture itself. Additional linebreaks may be inserted to ensure that each line of the rune is not longer than 78 characters.)
+* if a picture or several pictures are attached to the tweet, then they are displayed after the text of the tweet (instead of their short `t.co` URL), separated by single empty lines. (Each picture is represented by a Fidonet Rune of a hyperlink that leads to `pic.twitter.com` URL of the picture; that link's anchor is the picture itself. Additional linebreaks may be inserted to ensure that each line of the rune is not longer than 78 characters.) [Image descriptions](https://blog.twitter.com/2016/accessible-images-for-everyone) are used as alternative texts; if a description is not provided, a mere word “image” is used. Parentheses are added around alternative texts to distinguish them from normal text.
 
 Three empty lines separate individual tweets from each other.
 
