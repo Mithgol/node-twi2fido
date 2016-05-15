@@ -3,7 +3,7 @@
 "bin": "./twi2fido.js",
 "preferGlobal": true,
 "main": "t2f-core.js",
-"version": "2.4.1",
+"version": "2.4.2",
 "description": "Aggregates microblog entries from Twitter and prepares them for being posted to Fidonet.",
 "keywords": ["Fidonet", "Fido", "Twitter"],
 "author": { "name": "Mithgol the Webmaster" },
