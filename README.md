@@ -123,6 +123,10 @@ It is necessary to install [JSHint](http://jshint.com/) for testing.
 
 After that you may run `npm test` (in the directory of twi2fido). Only the JS code errors are caught; the code's behaviour is not tested.
 
+## See also
+
+The package [`fido2twi`](https://github.com/Mithgol/node-fido2twi) posts Fidonet messages to Twitter. It's a useful counterpart to `twi2fido`.
+
 ## License
 
 MIT license (see the `LICENSE` file).

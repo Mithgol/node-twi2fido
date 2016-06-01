@@ -97,7 +97,7 @@ module.exports = (loginName, options) => {
       consumer_key:        config.last('ConsumerKey'),
       consumer_secret:     config.last('ConsumerSecret'),
       access_token_key:    config.last('AccessTokenKey'),
-      access_token_secret: config.last('AccessTokenSecret'),
+      access_token_secret: config.last('AccessTokenSecret')
    });
 
    var tweeOptions = {
