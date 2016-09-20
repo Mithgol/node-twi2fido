@@ -104,7 +104,8 @@ module.exports = (loginName, options) => {
       // include_rts: false, ← can become a future setting!
       count: 80,
       include_ext_alt_text: true,
-      screen_name: loginName
+      screen_name: loginName,
+      tweet_mode: 'extended'
    };
    if(!( options.debug )){
       var lastRead = getLastReadFromFile(fileLastRead);
@@ -128,7 +129,9 @@ module.exports = (loginName, options) => {
       if( options.hashtags.length > 0 ){
          tweetList = tweetList.filter(function(nextTweet){
             // same as in the iterator below:
-            var sourceText = ( nextTweet.retweeted_status || nextTweet ).text;
+            var sourceText = (
+               nextTweet.retweeted_status || nextTweet
+            ).full_text;
 
             return getHashtagRegExp(options.hashtags).test(sourceText);
          });
@@ -142,7 +145,7 @@ module.exports = (loginName, options) => {
       var content = tweetList.reduce((prevContent, tweet) => {
          // same as in the filter above:
          var source = tweet.retweeted_status || tweet;
-         var sourceText = source.text;
+         var sourceText = source.full_text;
 
          // expand simple URLs in `sourceText`:
          if(
