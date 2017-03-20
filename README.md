@@ -61,7 +61,7 @@ An optional parameter `"--CHRS=CP866 2"` is accepted before or after any of t
 
 An optional parameter `"--hashtag=..."` parameter is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` writes only the tweets that contain at least one of the given hashtags. Several hashtags (separated by commas) may be given. (Example: `--hashtag=anime,manga,vn`.) The character `#` is optional before hashtags (it'll be added automatically if omitted in the command line).
 
-An optional parameter `"--debug"` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk and instead writes raw JSON from Twitter to the file `debug.json` in the directory where `twi2fido` resides.
+An optional parameter `"--debug"` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk (and neither reads nor updates `fileLastRead`) and instead writes raw JSON from Twitter (of the desinated `loginName`) to the file `debug.json` in the directory where `twi2fido` resides.
 
 The application does one of the following:
 
@@ -87,7 +87,12 @@ In the text of the tweet,
 
 * short `t.co` URLs are conveted back to long original URLs (unless they were longer than 78 characters),
 
-* if a picture or several pictures are attached to the tweet, then they are displayed after the text of the tweet (instead of their short `t.co` URL), separated by single empty lines. (Each picture is represented by a Fidonet Rune of a hyperlink that leads to `pic.twitter.com` URL of the picture; that link's anchor is the picture itself. Additional linebreaks may be inserted to ensure that each line of the rune is not longer than 78 characters.) [Image descriptions](https://blog.twitter.com/2016/accessible-images-for-everyone) are used as alternative texts; if a description is not provided, a mere word “image” is used. Parentheses are added around alternative texts to distinguish them from normal text.
+* if a picture or several pictures are attached to the tweet, then they are displayed after the text of the tweet (instead of their short `t.co` URL), separated by single empty lines. Each picture is represented by a Fidonet Rune of a hyperlink:
+   * The hyperlink leads to the picture in its “original” form. It should be mostly the same as the tweet's author's original uploaded file (except that Twitter [removes Exif data](https://support.twitter.com/articles/20156423) to anonymize the equipment and the geographical location). That file can be huge (many megabytes and many megapixels) and that's why it is made a hyperlink's target (does not directly appear directly in Fidonet) to save traffic and efforts of Fidonet readers and Twitter servers.
+   * The hyperlink's anchor is the picture in its default (Twitter-defined) resolution. As of March 2017, Twitter used “medium” pictures (resized to fit in 1200×1200 pixels).
+   * [Image descriptions](https://blog.twitter.com/2016/accessible-images-for-everyone) are used as alternative texts of images; if a description is not provided, a mere word “image” is used. Parentheses are added around alternative texts to distinguish them from normal text.
+   * The hyperlink's title is the word “zoom”.
+   * Additional linebreaks are automatically inserted (where necessary) to ensure that each line of the rune is not longer than 78 characters.
 
 Three empty lines separate individual tweets from each other.
 

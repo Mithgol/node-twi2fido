@@ -35,19 +35,19 @@ var getShortImageRune = (imageURL, linkURL, srcAltText) => {
    if( typeof srcAltText === 'string' ) altText = `(${srcAltText})`;
 
    // step 1, almost always fails
-   rune = `[![${altText}](${imageURL})](${linkURL})`;
+   rune = `[![${altText}](${imageURL})](${linkURL} "zoom")`;
    if(
       rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
    ) return rune;
 
    // step 2, almost always works
-   rune = `[![${altText}](${imageURL})\n](${linkURL})`;
+   rune = `[![${altText}](${imageURL})\n](${linkURL} "zoom")`;
    if(
       rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
    ) return rune;
 
    // step 3, should always work
-   rune = `[![${altText}\n](${imageURL})\n](${linkURL})`;
+   rune = `[![${altText}\n](${imageURL})\n](${linkURL} "zoom")`;
    if(
       rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
    ) return rune;
@@ -172,6 +172,8 @@ module.exports = (loginName, options) => {
                   typeof mediaURL.display_url === 'string' &&
                   ('https://' + mediaURL.display_url).length <= 78
                ){
+                  // `HTTPSURL` replaces `mediaURL.url` inside `txt`,
+                  // unless replaced by runes at the end of `txt` (see below):
                   var HTTPSURL = 'https://' + mediaURL.display_url;
                   var frags = txt.split(mediaURL.url);
                   if(
@@ -182,7 +184,8 @@ module.exports = (loginName, options) => {
                      var imageRunes = arrMediaURLs.filter(nextMediaURL =>
                         nextMediaURL.display_url === mediaURL.display_url
                      ).map(nextMediaURL => getShortImageRune(
-                        nextMediaURL.media_url_https, HTTPSURL,
+                        nextMediaURL.media_url_https,
+                        nextMediaURL.media_url_https + ':orig',
                         nextMediaURL.ext_alt_text
                      )).filter(nextRune => nextRune !== null);
 
