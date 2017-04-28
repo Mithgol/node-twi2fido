@@ -5,6 +5,7 @@ var cl = require('ciel');
 var escapeStringRegExp = require('escape-string-regexp');
 var fiunis = require('fiunis');
 var iconv = require('iconv-lite');
+var unescapeHTML = require('lodash.unescape');
 var moment = require('moment');
 var simteconf = require('simteconf');
 var twitter = require('twitter');
@@ -129,9 +130,11 @@ module.exports = (loginName, options) => {
       if( options.hashtags.length > 0 ){
          tweetList = tweetList.filter(function(nextTweet){
             // same as in the iterator below:
-            var sourceText = (
-               nextTweet.retweeted_status || nextTweet
-            ).full_text;
+            var sourceText = unescapeHTML(
+               (
+                  nextTweet.retweeted_status || nextTweet
+               ).full_text
+            );
 
             return getHashtagRegExp(options.hashtags).test(sourceText);
          });
@@ -145,7 +148,7 @@ module.exports = (loginName, options) => {
       var content = tweetList.reduce((prevContent, tweet) => {
          // same as in the filter above:
          var source = tweet.retweeted_status || tweet;
-         var sourceText = source.full_text;
+         var sourceText = unescapeHTML(source.full_text);
 
          // expand simple URLs in `sourceText`:
          if(
