@@ -103,7 +103,7 @@ module.exports = (loginName, options) => {
 
    var tweeOptions = {
       // include_rts: false, ← can become a future setting!
-      count: 80,
+      count: 100,
       include_ext_alt_text: true,
       screen_name: loginName,
       tweet_mode: 'extended'
