@@ -26,17 +26,18 @@ Icon?
 
 # Node.js modules
 node_modules
+package-lock.json
 
 # NPM error logs
 npm-debug.log
-
-# .npmignore should ignore tests and Git stuff
-test
-.gitignore
-.git
 
 # Project specific
 twi2fido.config
 *.tweets.txt
 *.lastread.txt
 debug.json
+
+# .npmignore should ignore tests and Git stuff
+test
+.gitignore
+.git
