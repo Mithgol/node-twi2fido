@@ -27,7 +27,9 @@ You may now move that directory (for example, on a flash drive) across syst
 
 Unlike the above (`npm -g`), the application does not appear in the `PATH`, and thus you'll have to run it directly from the application's directory. You'll also have to run `node twi2fido [parameters]` instead of `twi2fido [parameters]`.
 
-## Configuration steps
+## Configuration
+
+It is necessary to configure `twi2fido` before you run it. (For example, you cannot use [`npx`](https://github.com/zkat/npx) to run `npx twi2fido` without having to install `twi2fido` permanently.) You can configure `twi2fido` in three simple steps:
 
 1. Visit https://apps.twitter.com/ and register an application. (You may use “twi2fido” as the application's name and https://github.com/Mithgol/node-twi2fido/ as its site. The “read only” permissions should suffice because the application does not post anything to Twitter.)
 
@@ -37,7 +39,7 @@ Unlike the above (`npm -g`), the application does not appear in the `PATH`, a
 
 ## Using twi2fido
 
-You may run the installed application by typing in the command line:
+You may run the configured application by typing in the command line:
 
 `twi2fido loginName textOutput fileLastRead`
 
