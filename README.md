@@ -5,7 +5,7 @@ This application (`twi2fido`) aggregates microblog entries from Twitter and t
 This application is written in JavaScript and requires [Node.js](http://nodejs.org/) to run.
    * Starting from v2.0.0, this module requires Node.js version 4.0.0 (or newer) because it is rewritten in ECMAScript 2015 (ES6). Previous versions of Node.js (v0.10.x, v0.12.x) are themselves not maintained by their developers after 2016-12-31.
 
-Starting from v2.5.4, this application understands the “extended” version of tweets that has been introduced in the announcements “[Coming soon: express even more in 140 characters](https://blog.twitter.com/express-even-more-in-140-characters)” and “[Doing more with 140 characters](https://blog.twitter.com/2016/doing-more-with-140-characters)” in 2016.
+Starting from v2.5.4, this application understands the “extended” version of tweets that has been introduced in the announcements “[Coming soon: express even more in 140 characters](https://blog.twitter.com/express-even-more-in-140-characters)” and “[Doing more with 140 characters](https://blog.twitter.com/2016/doing-more-with-140-characters)” in 2016. The same changes in the source code are apparently enough to also support the doubled limit (280 characters) that has been introduced in the announcement “[Giving you more characters to express yourself](https://blog.twitter.com/official/en_us/topics/product/2017/Giving-you-more-characters-to-express-yourself.html)” in 2017.
 
 ## Installing twi2fido
 
