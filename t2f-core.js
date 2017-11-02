@@ -29,8 +29,9 @@ var eraseFile = filename => {
    } catch(e) {}
 };
 
+var limit = 78; // length limit for lines of runes and runewords
+
 var getShortImageRune = (imageURL, linkURL, srcAltText) => {
-   var limit = 78; // limit of `shortAltText` plus `'[![()'.length`
    var rune;
    var altText = '(image)';
    if( typeof srcAltText === 'string' ) altText = `(${srcAltText})`;
@@ -49,6 +50,32 @@ var getShortImageRune = (imageURL, linkURL, srcAltText) => {
 
    // step 3, should always work
    rune = `[![${altText}\n](${imageURL})\n](${linkURL} "zoom")`;
+   if(
+      rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
+   ) return rune;
+
+   return null; // URLs too large
+};
+
+var getAnimRuneword = mediaURL => {
+   var rune; // actually a runeword, but maintaining similarity to the above
+
+   if( typeof mediaURL.video_info !== 'object' ) return null; // source fault
+   if(!( Array.isArray(mediaURL.video_info.variants) )) return null;
+   var zeroVariant = mediaURL.video_info.variants[0];
+   if( zeroVariant.content_type !== 'video/mp4' ) return null;
+   if( typeof zeroVariant.url !== 'string' ) return null;
+   var linkURL = zeroVariant.url;
+   if( linkURL.length < 1 ) return null;
+
+   // step 1, almost always fails
+   rune = `[(animation)](${linkURL} "runeanim")`;
+   if(
+      rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
+   ) return rune;
+
+   // step 2, should always work: chunk = linkURL + 2 characters
+   rune = `[(animation)\n](${linkURL} "runeanim")`;
    if(
       rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
    ) return rune;
@@ -179,28 +206,37 @@ module.exports = (loginName, options) => {
                   // unless replaced by runes at the end of `txt` (see below):
                   var HTTPSURL = 'https://' + mediaURL.display_url;
                   var frags = txt.split(mediaURL.url);
-                  if(
-                     frags.length > 1 &&
-                     frags[frags.length-1] === '' &&
-                     mediaURL.type === 'photo'
-                  ){
-                     var imageRunes = arrMediaURLs.filter(nextMediaURL =>
-                        nextMediaURL.display_url === mediaURL.display_url
-                     ).map(nextMediaURL => getShortImageRune(
-                        nextMediaURL.media_url_https,
-                        nextMediaURL.media_url_https + ':orig',
-                        nextMediaURL.ext_alt_text
-                     )).filter(nextRune => nextRune !== null);
+                  if( frags.length > 1 && frags[frags.length-1] === '' ){
+                     //the tweet ends with `mediaURL.url`, might cause rune(s)
 
-                     if( imageRunes.length > 0 ){
-                        frags.pop();
-                        var separuner = '\n\n';
-                        if(
-                           frags.length === 1 && frags[0] === ''
-                        ) separuner = '';
-                        frags[frags.length-1] += separuner + imageRunes.join(
-                           '\n\n'
-                        );
+                     // create a separator to insert before the final rune(s):
+                     var separuner = '\n\n';
+                     if(
+                        frags.length === 1 && frags[0] === ''
+                     ) separuner = '';
+
+                     // detect the rune(s) or a runeword if necessary:
+                     if( mediaURL.type === 'photo' ){
+                        var imageRunes = arrMediaURLs.filter(nextMediaURL =>
+                           nextMediaURL.display_url === mediaURL.display_url
+                        ).map(nextMediaURL => getShortImageRune(
+                           nextMediaURL.media_url_https,
+                           nextMediaURL.media_url_https + ':orig',
+                           nextMediaURL.ext_alt_text
+                        )).filter(nextRune => nextRune !== null);
+
+                        if( imageRunes.length > 0 ){
+                           frags.pop();
+                           frags[
+                              frags.length-1
+                           ] += separuner + imageRunes.join('\n\n');
+                        }
+                     } else if( mediaURL.type === 'animated_gif' ){
+                        var animRuneword = getAnimRuneword(mediaURL);
+                        if( typeof animRuneword === 'string' ){
+                           frags.pop();
+                           frags[frags.length-1] += separuner + animRuneword;
+                        }
                      }
                   }
                   return frags.join(HTTPSURL);
