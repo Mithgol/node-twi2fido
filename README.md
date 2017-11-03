@@ -90,12 +90,15 @@ In the text of the tweet,
 
 * short `t.co` URLs are conveted back to long original URLs (unless they were longer than 78 characters),
 
-* if a picture or several pictures are attached to the tweet, then they are displayed after the text of the tweet (instead of their short `t.co` URL), separated by single empty lines. Each picture is represented by a Fidonet Rune of a hyperlink:
+* if a picture or several pictures are attached to the tweet, then they are displayed after the text of the tweet (instead of their short `t.co` URL), separated by single empty lines. Each picture is represented by a [Fidonet rune](https://github.com/Mithgol/node-fidonet-fidohtml/blob/master/runes.txt) of a hyperlink:
    * The hyperlink leads to the picture in its “original” form. It should be mostly the same as the tweet's author's original uploaded file (except that Twitter [removes Exif data](https://support.twitter.com/articles/20156423) to anonymize the equipment and the geographical location). That file can be huge (many megabytes and many megapixels) and that's why it is made a hyperlink's target (does not directly appear directly in Fidonet) to save traffic and efforts of Fidonet readers and Twitter servers.
-   * The hyperlink's anchor is the picture in its default (Twitter-defined) resolution. As of March 2017, Twitter used “medium” pictures (resized to fit in 1200×1200 pixels).
+   * The hyperlink's anchor is the picture in its default (Twitter-defined) resolution. As of March 2017, Twitter used “medium” pictures (resized to fit in 1200×1200 pixels) by default.
    * [Image descriptions](https://blog.twitter.com/2016/accessible-images-for-everyone) are used as alternative texts of images; if a description is not provided, a mere word “image” is used. Parentheses are added around alternative texts to distinguish them from normal text.
    * The hyperlink's title is the word “zoom”.
    * Additional linebreaks are automatically inserted (where necessary) to ensure that each line of the rune is not longer than 78 characters.
+
+* If an “animated GIF” is attached to the tweet, then it is displayed after the text of the tweet (instead of a short `t.co` URL of the picture), separated by an empty line.
+   * An “animated GIF” is represented by a [Fidonet runeword](https://github.com/Mithgol/node-fidonet-fidohtml/blob/master/runes.txt) of a video animation player because Twitter actually displays MP4 video loops instead of animated GIFs.
 
 Three empty lines separate individual tweets from each other.
 
