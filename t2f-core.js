@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
+var async = require('async');
 var cl = require('ciel');
 var escapeStringRegExp = require('escape-string-regexp');
 var fiunis = require('fiunis');
@@ -83,6 +84,19 @@ var getAnimRuneword = mediaURL => {
    return null; // URLs too large
 };
 
+var cbTweetToContent = (source, sourceText, cbContent) => cbContent(null, [
+   source.user.name, ' (@', source.user.screen_name, ') ',
+   moment(
+      source.created_at,
+      'ddd MMM DD HH:mm:ss ZZ YYYY'
+   ).utc().format('YYYY-MM-DD HH:mm:ss'),
+   ' (UTC)\n\n',
+   'https://twitter.com/', source.user.screen_name, '/status/', source.id_str,
+   '\n\n',
+   sourceText,
+   '\n\n\n\n'
+].join(''));
+
 module.exports = (loginName, options) => {
    var textOutput   = path.resolve(__dirname, options.textOutput);
    var fileLastRead = path.resolve(__dirname, options.fileLastRead);
@@ -150,13 +164,14 @@ module.exports = (loginName, options) => {
          cl.ok('Debug output has been written: ' + debugOutput);
          process.exit();
       }
+
       if( tweetList.length > 0 ){ // length before filtering
          fs.writeFileSync(fileLastRead, tweetList[0].id_str);
       }
 
       if( options.hashtags.length > 0 ){
-         tweetList = tweetList.filter(function(nextTweet){
-            // same as in the iterator below:
+         tweetList = tweetList.filter(nextTweet => {
+            // same as in the iterator (see ≈20 lines below):
             var sourceText = unescapeHTML(
                (
                   nextTweet.retweeted_status || nextTweet
@@ -172,122 +187,142 @@ module.exports = (loginName, options) => {
          return;
       }
       tweetList.reverse(); // undo reverse chronological order
-      var content = tweetList.reduce((prevContent, tweet) => {
-         // same as in the filter above:
-         var source = tweet.retweeted_status || tweet;
-         var sourceText = unescapeHTML(source.full_text);
+      async.map(
+         tweetList, // `tweetList` elements → Fidonet message's portions
+         (tweet, cbContent) => {
+            // same as in the filter (see ≈20 lines above):
+            var source = tweet.retweeted_status || tweet;
+            var sourceText = unescapeHTML(source.full_text);
 
-         // expand simple URLs in `sourceText`:
-         if(
-            typeof source.entities !== 'undefined' &&
-            Array.isArray(source.entities.urls)
-         ) sourceText = source.entities.urls.reduce((txt, objURL) => {
+            // expand simple URLs in `sourceText`:
             if(
-               typeof objURL.url === 'string' &&
-               typeof objURL.expanded_url === 'string' &&
-               objURL.expanded_url.length <= 78
-            ) return txt.split(objURL.url).join(objURL.expanded_url);
-
-            return txt;
-         }, sourceText);
-
-         // expand media URLs in `sourceText`:
-         if(
-            typeof source.extended_entities !== 'undefined' &&
-            Array.isArray(source.extended_entities.media)
-         ) sourceText = source.extended_entities.media.reduce(
-            (txt, mediaURL, mediaIDX, arrMediaURLs) => {
+               typeof source.entities !== 'undefined' &&
+               Array.isArray(source.entities.urls)
+            ) sourceText = source.entities.urls.reduce((txt, objURL) => {
                if(
-                  typeof mediaURL.url === 'string' &&
-                  typeof mediaURL.display_url === 'string' &&
-                  ('https://' + mediaURL.display_url).length <= 78
-               ){
-                  // `HTTPSURL` replaces `mediaURL.url` inside `txt`,
-                  // unless replaced by runes at the end of `txt` (see below):
+                  typeof objURL.url === 'string' &&
+                  typeof objURL.expanded_url === 'string' &&
+                  objURL.expanded_url.length <= 78
+               ) return txt.split(objURL.url).join(objURL.expanded_url);
+
+               return txt;
+            }, sourceText);
+
+            if(
+               typeof source.extended_entities === 'undefined' ||
+               !Array.isArray(source.extended_entities.media)
+            ) return cbTweetToContent(source, sourceText, cbContent);
+            //(cannot expand media URLs in `sourceText` → nothing else to do)
+
+            // expand media URLs in `sourceText`:
+            var arrMediaURLs = source.extended_entities.media;
+            async.eachOfSeries(
+               arrMediaURLs,
+               (mediaURL, mediaIDX, doneMediaURL) => {
+                  if(
+                     typeof mediaURL.url !== 'string' ||
+                     typeof mediaURL.display_url !== 'string' ||
+                     ('https://' + mediaURL.display_url).length > 78
+                  ) return doneMediaURL(null);
+                  // ( nothing to do with such `mediaURL` )
+
+                  // `HTTPSURL` replaces `mediaURL.url` inside `sourceText`,
+                  // though the last `mediaURL.url` can be replaced by rune(s)
+                  // later at the end of `sourceText` (see details below):
                   var HTTPSURL = 'https://' + mediaURL.display_url;
-                  var frags = txt.split(mediaURL.url);
-                  if( frags.length > 1 && frags[frags.length-1] === '' ){
-                     //the tweet ends with `mediaURL.url`, might cause rune(s)
-
-                     // create a separator to insert before the final rune(s):
-                     var separuner = '\n\n';
-                     if(
-                        frags.length === 1 && frags[0] === ''
-                     ) separuner = '';
-
-                     // detect the rune(s) or a runeword if necessary:
-                     if( mediaURL.type === 'photo' ){
-                        var imageRunes = arrMediaURLs.filter(nextMediaURL =>
-                           nextMediaURL.display_url === mediaURL.display_url
-                        ).map(nextMediaURL => getShortImageRune(
-                           nextMediaURL.media_url_https,
-                           nextMediaURL.media_url_https + ':orig',
-                           nextMediaURL.ext_alt_text
-                        )).filter(nextRune => nextRune !== null);
-
-                        if( imageRunes.length > 0 ){
-                           frags.pop();
-                           frags[
-                              frags.length-1
-                           ] += separuner + imageRunes.join('\n\n');
-                        }
-                     } else if( mediaURL.type === 'animated_gif' ){
-                        var animRuneword = getAnimRuneword(mediaURL);
-                        if( typeof animRuneword === 'string' ){
-                           frags.pop();
-                           frags[frags.length-1] += separuner + animRuneword;
-                        }
-                     }
+                  var frags = sourceText.split(mediaURL.url);
+                  if(
+                     frags.length < 2 || frags[frags.length-1] !== ''
+                  ){
+                     // the tweet does not end with `mediaURL.url`,
+                     // therefore cannot cause rune(s) or a runeword:
+                     sourceText = frags.join(HTTPSURL);
+                     return doneMediaURL(null);
                   }
-                  return frags.join(HTTPSURL);
-               } else return txt;
-            },
-            sourceText
-         );
 
-         return prevContent + [
-            source.user.name,
-            ' (@',
-            source.user.screen_name,
-            ') ',
-            moment(
-               source.created_at,
-               'ddd MMM DD HH:mm:ss ZZ YYYY'
-            ).utc().format('YYYY-MM-DD HH:mm:ss'),
-            ' (UTC)\n\n',
-            'https://twitter.com/',
-            source.user.screen_name,
-            '/status/',
-            source.id_str,
-            '\n\n',
-            sourceText,
-            '\n\n\n\n'
-         ].join('');
-      }, ''); // tweetList.reduce conversion to `content` finished
+                  // create a separator to insert before the final rune(s):
+                  var separuner = '\n\n';
+                  // and a special case when the tweet contains only rune(s):
+                  if( frags.length === 2 && frags[0] === '' ) separuner = '';
+                  // ( in that case frags[1] is also '' since the prev check )
 
-      twi.get('users/show', {screen_name: loginName}, (err, userdata) => {
-         content = '\u00A0\n' + content;
-         if( !err && typeof userdata.profile_image_url_https === 'string' ){
-            content = [
-               '\x01AVATAR: ',
-               userdata.profile_image_url.replace(
-                  /_normal\.(jpe?g|png|gif|svg|webp)$/,
-                  '.$1'
-               ),
-               '\n',
-               content
-            ].join('');
+                  // detect and render the necessary runes or runewords:
+                  if( mediaURL.type === 'photo' ){
+                     var imageRunes = arrMediaURLs.filter(nextMediaURL =>
+                        nextMediaURL.display_url === mediaURL.display_url
+                     ).map(nextMediaURL => getShortImageRune(
+                        nextMediaURL.media_url_https,
+                        nextMediaURL.media_url_https + ':orig',
+                        nextMediaURL.ext_alt_text
+                     )).filter(nextRune => nextRune !== null);
+
+                     if( imageRunes.length > 0 ){
+                        frags.pop();
+                        frags[
+                           frags.length-1
+                        ] += separuner + imageRunes.join('\n\n');
+                     }
+                     sourceText = frags.join(HTTPSURL);
+                     return doneMediaURL(null);
+                  } else if( mediaURL.type === 'animated_gif' ){
+                     var animRuneword = getAnimRuneword(mediaURL);
+                     if( typeof animRuneword === 'string' ){
+                        frags.pop();
+                        frags[frags.length-1] += separuner + animRuneword;
+                     }
+                     sourceText = frags.join(HTTPSURL);
+                     return doneMediaURL(null);
+                  } else { // unknown mediaURL type, nothing to do:
+                     sourceText = frags.join(HTTPSURL);
+                     return doneMediaURL(null);
+                  }
+               },
+               err => {
+                  if( err ) return cbContent(err);
+
+                  return cbTweetToContent(source, sourceText, cbContent);
+               }
+            );
+         }, // converted `tweetList` to portions of Fidonet message's content
+         (err, arrContent) => {
+            if( err ) throw err;
+
+            // add an empty line after kludges:
+            var content = '\u00A0\n' + arrContent.join('');
+
+            twi.get( // trying to get an avatar for the corresponding kludge
+               'users/show',
+               { screen_name: loginName },
+               (err, userdata) => {
+                  if(
+                     !err &&
+                     typeof userdata.profile_image_url_https === 'string'
+                  ){
+                     content = [
+                        '\x01AVATAR: ',
+                        userdata.profile_image_url.replace(
+                           /_normal\.(jpe?g|png|gif|svg|webp)$/,
+                           '.$1'
+                        ),
+                        '\n',
+                        content
+                     ].join('');
+                  }
+                  content = `\x01CHRS: ${options.CHRS
+                     }\n\x01SOURCESITE: Twitter\n${content}`;
+                  if( !modeUTF8 ) content = fiunis.encode(
+                     content, encodingCHRS
+                  );
+                  fs.writeFileSync(textOutput, content);
+                  cl.ok([
+                     tweetList.length,
+                     ' tweet',
+                     (tweetList.length > 1) ? 's' : '',
+                     ' written.'
+                  ].join(''));
+               }
+            );
          }
-         content = `\x01CHRS: ${options.CHRS
-            }\n\x01SOURCESITE: Twitter\n${content}`;
-         if( !modeUTF8 ) content = fiunis.encode(content, encodingCHRS);
-         fs.writeFileSync(textOutput, content);
-         cl.ok([
-            tweetList.length,
-            ' tweet',
-            (tweetList.length > 1)? 's' : '',
-            ' written.'
-         ].join(''));
-      });
+      );
    });
 };
