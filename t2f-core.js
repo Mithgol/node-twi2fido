@@ -6,10 +6,11 @@ var cl = require('ciel');
 var escapeStringRegExp = require('escape-string-regexp');
 var fiunis = require('fiunis');
 var iconv = require('iconv-lite');
-var unescapeHTML = require('lodash.unescape');
+var isgd = require('isgd');
 var moment = require('moment');
 var simteconf = require('simteconf');
 var twitter = require('twitter');
+var unescapeHTML = require('lodash.unescape');
 var XRegExp = require('xregexp');
 
 var config = simteconf( path.join(__dirname, 'twi2fido.config') );
@@ -62,7 +63,7 @@ var getAnimRuneword = mediaURL => {
    var rune; // actually a runeword, but maintaining similarity to the above
 
    if( typeof mediaURL.video_info !== 'object' ) return null; // source fault
-   if(!( Array.isArray(mediaURL.video_info.variants) )) return null;
+   if( !Array.isArray(mediaURL.video_info.variants) ) return null;
    var zeroVariant = mediaURL.video_info.variants[0];
    if( zeroVariant.content_type !== 'video/mp4' ) return null;
    if( typeof zeroVariant.url !== 'string' ) return null;
@@ -81,7 +82,48 @@ var getAnimRuneword = mediaURL => {
       rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
    ) return rune;
 
-   return null; // URLs too large
+   return null; // URL too large
+};
+
+var getVideoRuneword = (mediaURL, cbRuneword) => {
+   var rune; // actually a runeword, but maintaining similarity to the above
+
+   if( typeof mediaURL.video_info !== 'object' ) return cbRuneword(null);
+   if( !Array.isArray(mediaURL.video_info.variants) ) return cbRuneword(null);
+   var vidVariants = mediaURL.video_info.variants.filter(
+      nextVariant => typeof nextVariant.bitrate === 'number'
+   );
+   if( vidVariants.length < 1 ) return cbRuneword(null);
+   var sourceVideoURL = vidVariants.sort(
+      (a, b) => b.bitrate - a.bitrate // [0] is to contain the largest bitrate
+   )[0].url;
+   if( typeof sourceVideoURL !== 'string' ) return cbRuneword(null);
+   if( sourceVideoURL.length < 4 ) return cbRuneword(null); // 'ftp:'.length
+
+   isgd.shorten(sourceVideoURL, linkURL => {
+      if(
+         !linkURL.startsWith('https://is.gd/') &&
+         !linkURL.startsWith('http://is.gd/')
+      ){
+         cl.fail('Cannot shorten ' + sourceVideoURL);
+         cl.fail(linkURL); // is likely to contain an error message
+         return cbRuneword(null);
+      }
+
+      // step 1, might fail (though likely to work because of shortening)
+      rune = `[(video)](${linkURL} "runevideo")`;
+      if(
+         rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
+      ) return cbRuneword(rune);
+
+      // step 2, should always work: chunk = linkURL + 2 characters
+      rune = `[(video)\n](${linkURL} "runevideo")`;
+      if(
+         rune.split(/[ \n]/).every( chunk => chunk.length <= limit )
+      ) return cbRuneword(rune);
+
+      return cbRuneword(null); // URL too large
+   });
 };
 
 var cbTweetToContent = (source, sourceText, cbContent) => cbContent(null, [
@@ -272,6 +314,15 @@ module.exports = (loginName, options) => {
                      }
                      sourceText = frags.join(HTTPSURL);
                      return doneMediaURL(null);
+                  } else if( mediaURL.type === 'video' ){
+                     getVideoRuneword(mediaURL, videoRuneword => {
+                        if( typeof videoRuneword === 'string' ){
+                           frags.pop();
+                           frags[frags.length-1] += separuner + videoRuneword;
+                        }
+                        sourceText = frags.join(HTTPSURL);
+                        return doneMediaURL(null);
+                     });
                   } else { // unknown mediaURL type, nothing to do:
                      sourceText = frags.join(HTTPSURL);
                      return doneMediaURL(null);
