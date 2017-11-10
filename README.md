@@ -76,7 +76,7 @@ The application does one of the following:
 
 ### Format of the output text
 
-The inner format of `textOutput` tries to follow Twitter's [display requirements](https://dev.twitter.com/overview/terms/display-requirements) satisfying as many rules as possible for the plain text medium of Fidonet.
+The inner format of `textOutput` tries to follow Twitter's [display requirements](https://dev.twitter.com/overview/terms/display-requirements) satisfying as many rules as possible for the plain text medium of Fidonet which is devoid of JavaScript or Flash.
 
 For each of the tweets,
 
@@ -91,14 +91,20 @@ In the text of the tweet,
 * short `t.co` URLs are conveted back to long original URLs (unless they were longer than 78 characters),
 
 * if a picture or several pictures are attached to the tweet, then they are displayed after the text of the tweet (instead of their short `t.co` URL), separated by single empty lines. Each picture is represented by a [Fidonet rune](https://github.com/Mithgol/node-fidonet-fidohtml/blob/master/runes.txt) of a hyperlink:
-   * The hyperlink leads to the picture in its “original” form. It should be mostly the same as the tweet's author's original uploaded file (except that Twitter [removes Exif data](https://support.twitter.com/articles/20156423) to anonymize the equipment and the geographical location). That file can be huge (many megabytes and many megapixels) and that's why it is made a hyperlink's target (does not directly appear directly in Fidonet) to save traffic and efforts of Fidonet readers and Twitter servers.
+   * The hyperlink leads to the picture in its “original” form. Such form is expected to be mostly the same as the tweet's author's original uploaded file (except that Twitter [removes Exif data](https://support.twitter.com/articles/20156423) to anonymize the equipment and the geographical location). That file can be huge (many megabytes and many megapixels) and that's why it is made a hyperlink's target (does not directly appear directly in Fidonet) to save traffic and efforts of Fidonet readers and Twitter servers.
    * The hyperlink's anchor is the picture in its default (Twitter-defined) resolution. As of March 2017, Twitter used “medium” pictures (resized to fit in 1200×1200 pixels) by default.
    * [Image descriptions](https://blog.twitter.com/2016/accessible-images-for-everyone) are used as alternative texts of images; if a description is not provided, a mere word “image” is used. Parentheses are added around alternative texts to distinguish them from normal text.
    * The hyperlink's title is the word “zoom”.
    * Additional linebreaks are automatically inserted (where necessary) to ensure that each line of the rune is not longer than 78 characters.
 
 * If an “animated GIF” is attached to the tweet, then it is displayed after the text of the tweet (instead of a short `t.co` URL of the picture), separated by an empty line.
-   * An “animated GIF” is represented by a [Fidonet runeword](https://github.com/Mithgol/node-fidonet-fidohtml/blob/master/runes.txt) of a video animation player because Twitter actually displays MP4 video loops instead of animated GIFs.
+   * Such “animated GIF” is represented by a [Fidonet runeword](https://github.com/Mithgol/node-fidonet-fidohtml/blob/master/runes.txt) of a video animation player because Twitter actually displays MP4 video loops instead of animated GIFs.
+
+* If a video is attached to the tweet, then it is displayed after the text of the tweet (instead of a short `t.co` URL), separated by an empty line.
+   * Such video is represented by a [Fidonet runeword](https://github.com/Mithgol/node-fidonet-fidohtml/blob/master/runes.txt) of a video player.
+   * When Twitter provides alternative video representations with different bitrates (it usually does), the MP4 file with the largest bitrate is used.
+   * Twitter's video files' URLs (such as https://video.twimg.com/ext_tw_video/926154571898028033/pu/vid/1280x720/zH5jPOGKhksO8PxJ.mp4 for example) are usually too large for Fidonet (because Fidonet lines of text are 78 or 79 characters long traditionally, and IBM 80-column punched card format, [designed in 1928](https://en.wikipedia.org/wiki/Punched_card#IBM_80-column_punched_card_format_and_character_codes), seems to be the historical cause for that). Therefore `twi2fido` has to shorten video URLs. It currently uses [is.gd API](https://is.gd/apishorteningreference.php) for shortening.
+   * Twitter's [HTTP Live Streaming](https://en.wikipedia.org/wiki/HTTP_Live_Streaming) support (which can let the reader's browser choose the desired bitrate dynamically) is ignored because its support in browser engines is (as of November 2017) quite limited (e.g. not supported by Firefox, not supported by desktop versions of Google Chrome) and therefore is likely to hinder video performance on Fidonet WebBBS, and in RSS representaions of Fidonet echomail areas, and in Fidonet browsers based on Web browser engines.
 
 Three empty lines separate individual tweets from each other.
 
@@ -108,7 +114,7 @@ The output text is prepended by the following Fidonet kludges:
 
 * The `CHRS` kludge specifying the encoding charset (see above), given by the `"--CHRS=..."` parameter (or UTF-8 charset by default). Adheres to the [FTS-5003.001](http://ftsc.org/docs/fts-5003.001) standard.
 
-* The `AVATAR` kludge containing the URL of the avatar of the given Twitter's user. Adheres to the Fidonet avatars' standard (see the [Fidonet JAM](https://github.com/Mithgol/node-fidonet-jam) repository).
+* The `AVATAR` kludge containing the URL of the avatar of the given Twitter's user. Adheres to the [Fidonet avatars draft standard](https://github.com/Mithgol/node-fidonet-jam/blob/master/avatar.txt).
 
 * The `SOURCESITE: Twitter` kludge (i.e. the kludge `SOURCESITE` with the value `Twitter`). There is no corresponding standard, but such a mark might help to prevent reposts (back to Twitter) by applications that post messages to the opposite direction (from Fidonet to Twitter).
 
