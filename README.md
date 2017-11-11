@@ -76,7 +76,7 @@ The application does one of the following:
 
 ### Format of the output text
 
-The inner format of `textOutput` tries to follow Twitter's [display requirements](https://dev.twitter.com/overview/terms/display-requirements) satisfying as many rules as possible for the plain text medium of Fidonet which is devoid of JavaScript or Flash.
+The inner format of `textOutput` tries to follow Twitter's [display requirements](https://dev.twitter.com/overview/terms/display-requirements) satisfying as many rules as possible for the plain text medium of Fidonet which is devoid of client-side JavaScript or Flash.
 
 For each of the tweets,
 
