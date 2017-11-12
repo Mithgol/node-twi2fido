@@ -197,6 +197,8 @@ module.exports = (loginName, options) => {
    }
 
    twi.get('statuses/user_timeline', tweeOptions, (err, tweetList) => {
+      var lastreadID = null;
+
       if( err ) throw new Error( util.inspect(err, { depth: null }) );
 
       if( options.debug ){
@@ -207,13 +209,13 @@ module.exports = (loginName, options) => {
          process.exit();
       }
 
-      if( tweetList.length > 0 ){ // length before filtering
-         fs.writeFileSync(fileLastRead, tweetList[0].id_str);
-      }
+      // non-zero length before filtering → lastread update is needed:
+      if( tweetList.length > 0 ) lastreadID = tweetList[0].id_str;
 
+      // filtering:
       if( options.hashtags.length > 0 ){
          tweetList = tweetList.filter(nextTweet => {
-            // same as in the iterator (see ≈20 lines below):
+            // same as in the iterator (see ≈26 lines below):
             var sourceText = unescapeHTML(
                (
                   nextTweet.retweeted_status || nextTweet
@@ -223,16 +225,23 @@ module.exports = (loginName, options) => {
             return getHashtagRegExp(options.hashtags).test(sourceText);
          });
       }
-      if( tweetList.length < 1 ){ // length after filtering
+
+      // zero length after filtering → nothing to do, immediate exit:
+      if( tweetList.length < 1 ){
+         // exiting sequence initiated:
+         if( lastreadID !== null ) fs.writeFileSync(fileLastRead, lastreadID);
+
          eraseFile(textOutput);
          cl.skip('Zero tweets received, output file erased.');
          return;
       }
+
+      // the list of microblog entries is not empty → processing:
       tweetList.reverse(); // undo reverse chronological order
       async.map(
-         tweetList, // `tweetList` elements → Fidonet message's portions
+         tweetList, // `tweetList` elements → Fidonet message's text portions
          (tweet, cbContent) => {
-            // same as in the filter (see ≈20 lines above):
+            // same as in the filter (see ≈26 lines above):
             var source = tweet.retweeted_status || tweet;
             var sourceText = unescapeHTML(source.full_text);
 
@@ -258,15 +267,15 @@ module.exports = (loginName, options) => {
 
             // expand media URLs in `sourceText`:
             var arrMediaURLs = source.extended_entities.media;
-            async.eachOfSeries(
+            async.eachSeries(
                arrMediaURLs,
-               (mediaURL, mediaIDX, doneMediaURL) => {
+               (mediaURL, doneMediaURL) => {
                   if(
                      typeof mediaURL.url !== 'string' ||
                      typeof mediaURL.display_url !== 'string' ||
                      ('https://' + mediaURL.display_url).length > 78
                   ) return doneMediaURL(null);
-                  // ( nothing to do with such `mediaURL` )
+                  // ( cannot do anything with such `mediaURL` )
 
                   // `HTTPSURL` replaces `mediaURL.url` inside `sourceText`,
                   // though the last `mediaURL.url` can be replaced by rune(s)
@@ -338,7 +347,7 @@ module.exports = (loginName, options) => {
          (err, arrContent) => {
             if( err ) throw err;
 
-            // add an empty line after kludges:
+            // add an empty line “after kludges” (though they're added later):
             var content = '\u00A0\n' + arrContent.join('');
 
             twi.get( // trying to get an avatar for the corresponding kludge
@@ -351,7 +360,7 @@ module.exports = (loginName, options) => {
                   ){
                      content = [
                         '\x01AVATAR: ',
-                        userdata.profile_image_url.replace(
+                        userdata.profile_image_url_https.replace(
                            /_normal\.(jpe?g|png|gif|svg|webp)$/,
                            '.$1'
                         ),
@@ -365,6 +374,11 @@ module.exports = (loginName, options) => {
                      content, encodingCHRS
                   );
                   fs.writeFileSync(textOutput, content);
+
+                  // everything is OK → exiting sequence initiated:
+                  if(
+                     lastreadID !== null
+                  ) fs.writeFileSync(fileLastRead, lastreadID);
                   cl.ok([
                      tweetList.length,
                      ' tweet',
