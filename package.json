@@ -13,7 +13,7 @@
    "url": "https://github.com/Mithgol/node-twi2fido.git"
 },
 "dependencies": {
-   "async": "~2.5.0",
+   "async": "~2.6.0",
    "ciel": "~0.3.0",
    "escape-string-regexp": "~1.0.3",
    "fiunis": "~3.0.0",
