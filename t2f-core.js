@@ -226,6 +226,20 @@ module.exports = (loginName, options) => {
          });
       }
 
+      if( options.counting ){
+         if( tweetList.length < 1 ){
+            cl.skip('Zero tweets are waiting to be written.');
+         } else {
+            cl.status([
+               tweetList.length,
+               ' tweet',
+               (tweetList.length > 1) ? 's are' : ' is',
+               ' waiting to be written.'
+            ].join(''));
+         }
+         process.exit();
+      }
+
       // zero length after filtering → nothing to do, immediate exit:
       if( tweetList.length < 1 ){
          // exiting sequence initiated:

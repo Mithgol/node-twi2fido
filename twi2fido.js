@@ -12,6 +12,7 @@ params.shift(); // 'twi2fido'
 
 var CHRS = 'UTF-8 4';
 var hashtags = [];
+var countingMode = false;
 var debugMode = false;
 params = params.filter(nextParam => {
    if( nextParam.startsWith('--CHRS=') ){
@@ -23,6 +24,9 @@ params = params.filter(nextParam => {
       ).filter( nextChunk => nextChunk.length > 0 ).map(
          nextChunk => nextChunk.startsWith('#') ? nextChunk : ('#'+nextChunk)
       );
+      return false;
+   } else if( nextParam.toLowerCase() === '--count' ){
+      countingMode = true;
       return false;
    } else if( nextParam.toLowerCase() === '--debug' ){
       debugMode = true;
@@ -60,10 +64,18 @@ if( params.length < 1 ){
    clog('at least one of the given hashtags are published. Example:');
    clog('--hashtag=anime,manga,vn');
    clog('');
+   clog('An optional "--count" parameter (before or after any of the above)');
+   clog('switches twi2fido to the counting mode. The recent tweets are not');
+   clog('written to disk; instead of it, twi2fido reports the number of');
+   clog('unposted tweets (taking "--hashtag=..." into account if present).');
+   clog('You may use it before posting to check how many tweets would be');
+   clog('posted.');
+   clog('');
    clog('An optional "--debug" parameter (before or after any of the above)');
    clog('switches twi2fido to the debug mode. The recent tweets are not');
    clog('written to disk; instead of it, raw JSON data from Twitter becomes');
    clog('written to the file debug.json in the directory of twi2fido.');
+   clog('It also ignores "--count" even if it is present.');
    process.exit(1);
 } else if (params.length === 1) {
    loginName    = params[0];
@@ -85,6 +97,7 @@ twi2fido(loginName, {
    textOutput: textOutput,
    fileLastRead: fileLastRead,
    CHRS: CHRS,
+   counting: countingMode,
    debug: debugMode,
    hashtags: hashtags
 });
