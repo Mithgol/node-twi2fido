@@ -62,7 +62,9 @@ An optional parameter `"--CHRS=CP866 2"` is accepted before or after any of t
    * The corresponding `CHRS` kludge is added to the output message exactly as the [FTS-5003.001](http://ftsc.org/docs/fts-5003.001) standard dictates.
    * Where a character or a sequence of characters from a tweet cannot be represented in the designated encoding (for example, East Asian character “魔” in Russian CP866 encoding), a [Fidonet Unicode substring](https://github.com/Mithgol/fiunis) is created to represent such characters.
 
-An optional parameter `"--hashtag=..."` parameter is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` writes only the tweets that contain at least one of the given hashtags. Several hashtags (separated by commas) may be given. (Example: `--hashtag=anime,manga,vn`.) The character `#` is optional before hashtags (it'll be added automatically if omitted in the command line).
+An optional parameter `--norunes` is accepted before or after any of the above parameters. It prevents Fidonet runes from being generated to represent attachments (images, videos, “animated GIFs”; see below).
+
+An optional parameter `"--hashtag=..."` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` writes only the tweets that contain at least one of the given hashtags. Several hashtags (separated by commas) may be given. (Example: `--hashtag=anime,manga,vn`.) The character `#` is optional before hashtags (it'll be added automatically if omitted in the command line).
 
 An optional parameter `--count` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk (and neither reads nor updates `fileLastRead`) and instead reports the number of tweets it would write if called without `--count`. (It takes `"--hashtag=..."` into account if it is present.) It is useful for checking if the post would contain enough tweets, for example.
 
@@ -107,6 +109,8 @@ In the text of the tweet,
    * When Twitter provides alternative video representations with different bitrates (it usually does), the MP4 file with the largest bitrate is used.
    * Twitter's video files' URLs (such as https://video.twimg.com/ext_tw_video/926154571898028033/pu/vid/1280x720/zH5jPOGKhksO8PxJ.mp4 for example) are usually too large for Fidonet (because Fidonet lines of text are 78 or 79 characters long traditionally, and IBM 80-column punched card format, [designed in 1928](https://en.wikipedia.org/wiki/Punched_card#IBM_80-column_punched_card_format_and_character_codes), seems to be the historical cause for that). Therefore `twi2fido` has to shorten video URLs. It currently uses [is.gd API](https://is.gd/apishorteningreference.php) for shortening.
    * Twitter's [HTTP Live Streaming](https://en.wikipedia.org/wiki/HTTP_Live_Streaming) support (which can let the reader's browser choose the desired bitrate dynamically) is ignored because its support in browser engines is (as of November 2017) quite limited (e.g. not supported by Firefox, not supported by desktop versions of Google Chrome) and therefore is likely to hinder video performance on Fidonet WebBBS, and in RSS representaions of Fidonet echomail areas, and in Fidonet browsers based on Web browser engines.
+
+However, all these attachments (images, videos, “animated GIFs”) are not converted to Fidonet runes if an optional parameter `--norunes` is given to `twi2fido`.
 
 Three empty lines separate individual tweets from each other.
 

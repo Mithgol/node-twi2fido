@@ -228,13 +228,13 @@ module.exports = (loginName, options) => {
 
       if( options.counting ){
          if( tweetList.length < 1 ){
-            cl.skip('Zero tweets are waiting to be written.');
+            cl.skip('Zero tweets are waiting to be reposted in Fidonet.');
          } else {
             cl.status([
                tweetList.length,
                ' tweet',
                (tweetList.length > 1) ? 's are' : ' is',
-               ' waiting to be written.'
+               ' waiting to be reposted in Fidonet.'
             ].join(''));
          }
          process.exit();
@@ -297,9 +297,11 @@ module.exports = (loginName, options) => {
                   var HTTPSURL = 'https://' + mediaURL.display_url;
                   var frags = sourceText.split(mediaURL.url);
                   if(
+                     options.noRunes ||
                      frags.length < 2 || frags[frags.length-1] !== ''
                   ){
-                     // the tweet does not end with `mediaURL.url`,
+                     // either Fidonet runes are disabled,
+                     // or the tweet does not end with `mediaURL.url`,
                      // therefore cannot cause rune(s) or a runeword:
                      sourceText = frags.join(HTTPSURL);
                      return doneMediaURL(null);

@@ -14,6 +14,7 @@ var CHRS = 'UTF-8 4';
 var hashtags = [];
 var countingMode = false;
 var debugMode = false;
+var noRunes = false;
 params = params.filter(nextParam => {
    if( nextParam.startsWith('--CHRS=') ){
       CHRS = nextParam.slice('--CHRS='.length);
@@ -24,6 +25,9 @@ params = params.filter(nextParam => {
       ).filter( nextChunk => nextChunk.length > 0 ).map(
          nextChunk => nextChunk.startsWith('#') ? nextChunk : ('#'+nextChunk)
       );
+      return false;
+   } else if( nextParam.toLowerCase() === '--norunes' ){
+      noRunes = true;
       return false;
    } else if( nextParam.toLowerCase() === '--count' ){
       countingMode = true;
@@ -57,6 +61,10 @@ if( params.length < 1 ){
    clog('All of the FTS-5003.001 Level 2 character sets are supported');
    clog('as long as https://github.com/ashtuchkin/iconv-lite knows of them');
    clog('(usually it does).');
+   clog('');
+   clog('An optional "--norunes" parameter (before or after any of the');
+   clog('above) prevents Fidonet runes from being generated to represent');
+   clog('attachments (images, videos, animations) at the end of tweets.');
    clog('');
    clog('An optional "--hashtag=..." parameter (before or after any of the');
    clog('above) enables filtering by Twitter hashtags. Several hashtags');
@@ -97,6 +105,7 @@ twi2fido(loginName, {
    textOutput: textOutput,
    fileLastRead: fileLastRead,
    CHRS: CHRS,
+   noRunes: noRunes,
    counting: countingMode,
    debug: debugMode,
    hashtags: hashtags
