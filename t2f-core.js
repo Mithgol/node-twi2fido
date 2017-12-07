@@ -143,7 +143,7 @@ var getHashtagRegExp = hashtags => XRegExp([
    '(?:',
    hashtags.map( nextHashtag => escapeStringRegExp(nextHashtag) ).join('|'),
    ')(?=$|\\PL)'
-].join(''), 'gi');
+].join(''), 'giA');
 
 module.exports = (loginName, options) => {
    var textOutput   = path.resolve(__dirname, options.textOutput);
