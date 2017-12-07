@@ -139,6 +139,12 @@ var cbTweetToContent = (source, sourceText, cbContent) => cbContent(null, [
    '\n\n\n\n'
 ].join(''));
 
+var getHashtagRegExp = hashtags => XRegExp([
+   '(?:',
+   hashtags.map( nextHashtag => escapeStringRegExp(nextHashtag) ).join('|'),
+   ')(?=$|\\PL)'
+].join(''), 'gi');
+
 module.exports = (loginName, options) => {
    var textOutput   = path.resolve(__dirname, options.textOutput);
    var fileLastRead = path.resolve(__dirname, options.fileLastRead);
@@ -168,14 +174,6 @@ module.exports = (loginName, options) => {
       process.exit(1);
    }
    var modeUTF8 = (encodingCHRS === 'UTF-8' || encodingCHRS === 'UTF8');
-
-   var getHashtagRegExp = hashtags => XRegExp([
-      '(?:',
-      hashtags.map(
-         nextHashtag => escapeStringRegExp(nextHashtag)
-      ).join('|'),
-      ')(?=$|[^\\p{L}])'
-   ].join(''), 'gi');
 
    var twi = new twitter({
       consumer_key:        config.last('ConsumerKey'),
