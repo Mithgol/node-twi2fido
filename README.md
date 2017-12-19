@@ -66,7 +66,7 @@ An optional parameter `--norunes` is accepted before or after any of the abo
 
 An optional parameter `"--hashtag=..."` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` writes only the tweets that contain at least one of the given hashtags. Several hashtags (separated by commas) may be given. (Example: `--hashtag=anime,manga,vn`.) The character `#` is optional before hashtags (it'll be added automatically if omitted in the command line).
 
-An optional parameter `--count` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk (and neither reads nor updates `fileLastRead`) and instead reports the number of tweets it would write if called without `--count`. (It takes `"--hashtag=..."` into account if it is present.) It is useful for checking if the post would contain enough tweets, for example.
+An optional parameter `--count` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk (and does not update `fileLastRead`) and instead reports the number of tweets it would write if called without `--count`. (It takes `"--hashtag=..."` into account if it is present.) It is useful for checking if the post would contain enough tweets (or too many tweets), for example.
 
 An optional parameter `--debug` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk (and neither reads nor updates `fileLastRead`) and instead writes raw JSON from Twitter (of the desinated `loginName`) to the file `debug.json` in the directory where `twi2fido` resides. (It also ignores `--count` even if it is present.)
 
