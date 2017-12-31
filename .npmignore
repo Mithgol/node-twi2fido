@@ -36,7 +36,6 @@ twi2fido.config
 *.tweets.txt
 *.lastread.txt
 debug.json
-*.bat
 
 # .npmignore should ignore tests and Git stuff
 test

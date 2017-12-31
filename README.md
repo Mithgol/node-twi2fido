@@ -68,7 +68,7 @@ An optional parameter `"--hashtag=..."` is accepted before or after any of th
 
 An optional parameter `--count` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk (and does not update `fileLastRead`) and instead reports the number of tweets it would write if called without `--count`. (It takes `"--hashtag=..."` into account if it is present.) It is useful for checking if the post would contain enough tweets (or too many tweets), for example.
 
-An optional parameter `--debug` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk (and neither reads nor updates `fileLastRead`) and instead writes raw JSON from Twitter (of the desinated `loginName`) to the file `debug.json` in the directory where `twi2fido` resides. (It also ignores `--count` even if it is present.)
+An optional parameter `--debug` is accepted before or after any of the above parameters. If such parameter is present, `twi2fido` does not write tweets to disk (and neither reads nor updates `fileLastRead`) and instead writes raw JSON from Twitter (of the desinated `loginName`) to the file `debug.json` in the directory where `twi2fido` resides. (It also ignores `--count` even if it is present.) See `debug.bat` as an example of such debug on Windows.
 
 The application does one of the following:
 

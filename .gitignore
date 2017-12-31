@@ -36,4 +36,3 @@ twi2fido.config
 *.tweets.txt
 *.lastread.txt
 debug.json
-*.bat
