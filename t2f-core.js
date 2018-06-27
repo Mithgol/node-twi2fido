@@ -36,7 +36,10 @@ var limit = 78; // length limit for lines of runes and runewords
 var getShortImageRune = (imageURL, linkURL, srcAltText) => {
    var rune;
    var altText = '(image)';
-   if( typeof srcAltText === 'string' ) altText = `(${srcAltText})`;
+   if( typeof srcAltText === 'string' ){
+      srcAltText = srcAltText.replace(/"/g, '\\"'); // escape quotes
+      altText = `(${srcAltText})`;
+   }
 
    // step 1, almost always fails
    rune = `[![${altText}](${imageURL})](${linkURL} "zoom")`;
